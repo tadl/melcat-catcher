@@ -26,7 +26,7 @@ if params[:sort].present?
     elsif params[:sort] == "OLDEST TO NEWEST"
     @sorttype = "&sort=pubdate"
     @sortdefault ="OLDEST TO NEWEST" 
-    elsif
+    else
     @sorttype = "&sort="
     @sortdefault ="RELEVANCE" 
     end
@@ -130,7 +130,7 @@ if params[:sort].present?
     elsif params[:sort] == "OLDEST TO NEWEST"
     @sorttype = "&sort=pubdate"
     @sortdefault ="OLDEST TO NEWEST" 
-    elsif
+    else
     @sorttype = "&sort="
     @sortdefault ="RELEVANCE" 
     end
