@@ -347,7 +347,7 @@ form.field_with(:name => "password").value = @password
 results = agent.submit(form)
 renew = agent.get('https://catalog.tadl.org/eg/opac/myopac/circs?&action=renew&circ='+ @circ_id +'')
 @doc = renew.parser
-@test = @doc.css(".renew-summary").text.try(:gsub!, /\n/," ").try(:gsub!, /[^0-9A-Za-z]/, '').try(:squeeze, " ").try(:strip).try(:gsub, /torenew1items/, '')
+@renew_summary = @doc.css(".renew-summary").text
 @checkouts = @doc.search('tr').text_includes(@barcode).map do |checkout|
 {
 checkout:
@@ -362,7 +362,7 @@ checkout:
 end
 
 respond_to do |format|
-format.json { render :json => Oj.dump(:checkouts => @checkouts, :response => @test )}   
+format.json { render :json => Oj.dump(:checkouts => @checkouts, :response => @renew_summary)}   
 end
 end
 
