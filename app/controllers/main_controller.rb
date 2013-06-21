@@ -409,16 +409,16 @@ accountpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/main")
 {
 user:
 {
-:name => item.at_css('#dash_user').text.strip,
-:checkouts => item.at_css('#dash_checked').text.strip, 
-:holds => item.at_css('#dash_holds').text.strip,
-:pickups => item.at_css('#dash_pickup').text.strip,
-:fines => item.at_css('#dash_fines').text.strip, 
+:name => item.at_css('#dash_user').try(:text).try(:strip),
+:checkouts => item.at_css('#dash_checked').try(:text).try(:strip),
+:holds => item.at_css('#dash_holds').try(:text).try(:strip),
+:pickups => item.at_css('#dash_pickup').try(:text).try(:strip),
+:fines => item.at_css('#dash_fines').try(:text).try(:strip),
 }
 }
-end 
+end
 
-if @user.count == 0
+if @user.count == 0 || @user[0][:user][:name] == nil
 
 respond_to do |format|
 format.json { render :json => { :status => :error, :message => "Bad Login or Password" }}
