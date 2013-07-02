@@ -145,7 +145,7 @@ else
 end
 
 if params[:mt].present?    
-    if params[:mt] == "VIDEOS"
+    if params[:mt] == "MOVIES"
     @mediatype = "format=g"
     @fdefault ="MOVIES"    
     elsif params[:mt] == "BOOKS"
