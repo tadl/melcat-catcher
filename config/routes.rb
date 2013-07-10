@@ -13,6 +13,7 @@ Ilscatcher::Application.routes.draw do
   get "main/itemonshelf"
   get "main/showcard"
   get "melcat/searchmelcat"
+  get "melcat/showmelcat"
   root :to => 'main#index'
   
   match ':controller/:action/:pagenumber/:querytitle'
