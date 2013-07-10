@@ -61,7 +61,7 @@ shelf_location:
 :library => detail.at_css("td[1]").try(:text).try(:squeeze, " "),
 :shelving_location => detail.at_css("td[2]").try(:text).try(:squeeze, " "),
 :call_number => detail.at_css("td[4]").try(:text).try(:squeeze, " "),
-:available => detail.at_css("td[5]").try(:text).try(:squeeze, " "),
+:status => detail.at_css("td[5]").try(:text).try(:squeeze, " "),
 }
 }
 end
@@ -69,13 +69,15 @@ end
 @shelvinglocations_filtered = @shelvinglocations.compact.uniq
 end
 
-
-@test = @pagetitle
-
+if @shelvinglocations_filtered.empty?
 respond_to do |format|
-format.json { render :json => Oj.dump(items: @shelvinglocations_filtered)  }
+format.json { render :json => Oj.dump(message: "none available")  }
 end
-
+else
+respond_to do |format|
+format.json { render :json => Oj.dump(available: @shelvinglocations_filtered)  }
+end
+end
 
 
 
