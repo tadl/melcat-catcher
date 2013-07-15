@@ -553,10 +553,37 @@ accountdetails = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs?loc=22
 @doc = accountdetails.parser
 @barcode = @doc.css('.active_barcode').text
 respond_to do |format|
-
 format.json { render :json => { :barcode => @barcode}}
+end
+end
+
+def checkupdates
+headers['Access-Control-Allow-Origin'] = "*"
+@version_id = params[:version_id]
+@current_version = "3.4"
+@android_update = "https://play.google.com/store/apps/details?id=com.bredir.boopsie.tadl"
+@ios_update = "https://itunes.apple.com/ua/app/tadl/id428802059"
+
+if @current_version === @version_id
+@message = "up to date client"
+else
+@message = "Important Upates Available"
+end
+
+respond_to do |format|
+
+if @message === "up to date client"
+format.json { render :json => { :message => @message}}
+else
+format.json { render :json => { :message => @message, :ios_update => @ios_update, :android_update => @android_update}}
+end
+
+
 
 end
+
+
+
 
 
 end

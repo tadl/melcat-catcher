@@ -12,6 +12,7 @@ Ilscatcher::Application.routes.draw do
   get "main/showpickups"
   get "main/itemonshelf"
   get "main/showcard"
+  get "main/checkupdates"
   get "melcat/searchmelcat"
   get "melcat/showmelcat"
   root :to => 'main#index'
