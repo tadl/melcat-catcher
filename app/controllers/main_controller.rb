@@ -560,22 +560,45 @@ end
 def checkupdates
 headers['Access-Control-Allow-Origin'] = "*"
 @version_id = params[:version_id]
-@current_version = "3.4"
+@platform = params[:platform]
+@android_current_version = "3.4"
+@ios_current_version = "3.3"
 @android_update = "https://play.google.com/store/apps/details?id=com.bredir.boopsie.tadl"
 @ios_update = "https://itunes.apple.com/ua/app/tadl/id428802059"
 
+if @platform === "ios"
+@current_version = @ios_current_version
 if @current_version === @version_id
 @message = "up to date client"
 else
 @message = "Important Upates Available"
 end
+end
+
+if @platform === "android"
+@current_version = @android_current_version
+if @current_version === @version_id
+@message = "up to date client"
+else
+@message = "Important Upates Available"
+end
+end
+
+
+
 
 respond_to do |format|
 
 if @message === "up to date client"
 format.json { render :json => { :message => @message}}
 else
-format.json { render :json => { :message => @message, :ios_update => @ios_update, :android_update => @android_update}}
+if @platform === "android"
+format.json { render :json => { :message => @message, :update_link => @android_update}}
+end
+if @platform === "ios"
+format.json { render :json => { :message => @message, :update_link => @ios_update}}
+
+end
 end
 
 
