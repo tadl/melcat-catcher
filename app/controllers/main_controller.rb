@@ -561,7 +561,7 @@ def checkupdates
 headers['Access-Control-Allow-Origin'] = "*"
 @version_id = params[:version_id]
 @platform = params[:platform]
-@android_current_version = "3.4"
+@android_current_version = "3"
 @ios_current_version = "3.3"
 @android_update = "https://play.google.com/store/apps/details?id=org.TADL.TADLMobile"
 @ios_update = "https://itunes.apple.com/ua/app/tadl/id428802059"
@@ -571,7 +571,7 @@ if @platform === "ios"
 if @current_version === @version_id
 @message = "up to date client"
 else
-@message = "Important Upates Available"
+@message = "Updates Available"
 end
 end
 
