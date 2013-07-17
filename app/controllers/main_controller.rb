@@ -580,7 +580,7 @@ if @platform === "android"
 if @current_version === @version_id
 @message = "up to date client"
 else
-@message = "Important Upates Available"
+@message = "Updates Available"
 end
 end
 
