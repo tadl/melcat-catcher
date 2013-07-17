@@ -563,7 +563,7 @@ headers['Access-Control-Allow-Origin'] = "*"
 @platform = params[:platform]
 @android_current_version = "3.4"
 @ios_current_version = "3.3"
-@android_update = "https://play.google.com/store/apps/details?id=com.bredir.boopsie.tadl"
+@android_update = "https://play.google.com/store/apps/details?id=org.TADL.TADLMobile"
 @ios_update = "https://itunes.apple.com/ua/app/tadl/id428802059"
 
 if @platform === "ios"
