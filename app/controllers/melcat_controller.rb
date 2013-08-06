@@ -29,7 +29,8 @@ item:
 :p_description => item.css('td[4]/br')[1].next.try(:text).try(:strip),
 :isbn => item.css('td[4]/br')[2].next.try(:text).try(:strip).gsub(/[^0-9]/, ""),
 :melcat_id => item.at_css('td[1]/input')['value'],
-:get_link => item.at_css('td[3]/a')['href'],
+:link => CGI::escape(item.at_css('td[3]/a')['href']),
+:available => HTTParty.get('http://tadl-ilscatcher.herokuapp.com/melcat/testmelcat.json?request_link='+ CGI::escape(item.at_css('td[3]/a')['href'])).body
 }
 }
 end 
@@ -45,15 +46,11 @@ end
 
 
 def testmelcat
-@record_id = params[:record_id]
-  
+@request_link = params[:request_link]
+@request_url = URI::escape(@request_link)    
 
-@pagetitle = 'http://elibrary.mel.org/record=' + @record_id 
-url = @pagetitle
-@doc = Nokogiri::HTML(open(url))
-@request_link = @doc.css('.bibInfo a')[0]["href"]
-full_request_link = 'https://elibrary.mel.org'+ @request_link
-@checkpage = Nokogiri::HTML(open(full_request_link))
+
+@checkpage = Nokogiri::HTML(open(@request_link))
 if @checkpage.at_css('p:contains("Sorry")').present?
 @gotit = "nope"
 else
