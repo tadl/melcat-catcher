@@ -14,6 +14,8 @@ group :development do
 gem 'sqlite3-ruby'
 end
 
+gem 'httparty'
+gem 'multi_xml'
 gem 'nokogiri'
 gem 'nikkou'
 gem 'oj'

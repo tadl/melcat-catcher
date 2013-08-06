@@ -6,6 +6,7 @@ require 'nokogiri'
 require 'open-uri'
 require 'oj'
 require 'nikkou'
+require 'httparty'
 
 def searchmelcat
 
@@ -27,7 +28,8 @@ item:
 :author => item.css('td[4]/br')[1].previous.try(:text).try(:strip),
 :p_description => item.css('td[4]/br')[1].next.try(:text).try(:strip),
 :isbn => item.css('td[4]/br')[2].next.try(:text).try(:strip).gsub(/[^0-9]/, ""),
-:melcat_id => item.at_css('td[1]/input')['value']
+:melcat_id => item.at_css('td[1]/input')['value'],
+:get_link => item.at_css('td[3]/a')['href'],
 }
 }
 end 
@@ -42,6 +44,32 @@ end
 end
 
 
+def testmelcat
+@record_id = params[:record_id]
+  
+
+@pagetitle = 'http://elibrary.mel.org/record=' + @record_id 
+url = @pagetitle
+@doc = Nokogiri::HTML(open(url))
+@request_link = @doc.css('.bibInfo a')[0]["href"]
+full_request_link = 'https://elibrary.mel.org'+ @request_link
+@checkpage = Nokogiri::HTML(open(full_request_link))
+if @checkpage.at_css('p:contains("Sorry")').present?
+@gotit = "nope"
+else
+@gotit = "yep"
+end
+
+
+respond_to do |format|
+format.json { render :json => Oj.dump(message: @gotit)  }
+end
+
+
+end
+
+
+
 def showmelcat
 
 
@@ -51,9 +79,10 @@ def showmelcat
 @pagetitle = 'http://elibrary.mel.org/record=' + @record_id 
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))
+@request_link = @doc.css('//div.bibInfo/a')
 
-if @doc.css('//table.centralHoldingsTable//tr').present?
-@shelvinglocations = @doc.css('//table.centralHoldingsTable//tr')[1..-1].map do |detail|
+if @doc.xpath("//*[@*[contains(., 'Holdings')]]").present?
+@shelvinglocations = @doc.xpath("//*[@*[contains(., 'Holdings')]]").map do |detail|
 if detail.at_css("td[5]").try(:text).try(:squeeze, " ") == "AVAILABLE" 
 {
 shelf_location:
