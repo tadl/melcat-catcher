@@ -255,7 +255,6 @@ item:
 :image => detail.at_css('#rdetail_image').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
 :format_icon => detail.at_css('.format_icon/img').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
 :record_year => detail.search('span[@itemprop="datePublished"]').try(:text),
-
 }
 }
 end
@@ -287,7 +286,6 @@ end
 
 def itemonshelf
 headers['Access-Control-Allow-Origin'] = "*"
-
 @record_id = params[:record_id]
 @pagetitle = 'http://catalog.tadl.org/eg/opac/record/' + @record_id + '?locg=22;copy_offset=0;copy_limit=75'
 url = @pagetitle
@@ -305,14 +303,9 @@ item:
 :available => detail.at_css("td[4]").try(:text).try(:squeeze, " "),
 }
 }
-
-
-
 end
 end
-
 @filtered = @record_details.compact
-
 respond_to do |format|
 format.json { render :json => Oj.dump(items: @filtered.uniq)  }
 end

@@ -8,19 +8,52 @@ require 'oj'
 require 'nikkou'
 require 'httparty'
 
-def searchmelcat
 
+
+
+def searchmelcat
+headers['Access-Control-Allow-Origin'] = "*"
 if params[:q].present?
 @searchquery = params[:q]
 @searchqueryclearned = CGI::escape(@searchquery)    
 else
 @searchqueryclearned = ""       
-end    
+end 
+
+@count = params[:count]
+
+if @count == "1"
+@load_count = 1..-1
+@result_count = 10
+end
+
+if @count == "2"
+@load_count = 15..-1
+@result_count = 10
+end
+
+if @count == "3"
+@load_count = 25..-1 
+@result_count = 10
+end
+
+if @count == "4"
+@load_count = 35..-1
+@result_count = 10
+end
+
+if @count == "5"
+@load_count = 45..-1
+@result_count = 11
+end
+
+
+
 
 @pagetitle = 'http://elibrary.mel.org/search/a?searchtype=X&searcharg=' + @searchqueryclearned + '&SORT=D' 
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))
-@itemlist = @doc.search('tr').text_includes("ISBN/ISSN:").map do |item|
+@itemlist = @doc.search('//tr[1]')[@load_count].text_includes("ISBN/ISSN:").first(@result_count).map do |item|
 {
 item:
 {
@@ -35,10 +68,22 @@ item:
 }
 end 
 
+
+
+
+
+
+
+
+
+
+
+
+
 @test = @pagetitle
 
 respond_to do |format|
-format.json { render :json => Oj.dump(items: @itemlist.uniq)  }
+format.json { render :json => Oj.dump(items: @itemlist)  }
 end
 
 
@@ -116,3 +161,4 @@ end
 
 end
 end
+
