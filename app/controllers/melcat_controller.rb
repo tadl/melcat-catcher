@@ -1,4 +1,5 @@
 class MelcatController < ApplicationController
+headers['Access-Control-Allow-Origin'] = "*"
 respond_to :html, :json
 require 'rubygems'
 require 'mechanize'
