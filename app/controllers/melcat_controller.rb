@@ -70,20 +70,10 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
 @test = @pagetitle
 
 respond_to do |format|
-format.json { render :json => Oj.dump(items: @itemlist)  }
+format.json { render :json => Oj.dump(items: @itemlist.uniq)  }
 end
 
 
