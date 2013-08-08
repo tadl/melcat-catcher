@@ -1,5 +1,4 @@
 class MelcatController < ApplicationController
-headers['Access-Control-Allow-Origin'] = "*"
 respond_to :html, :json
 require 'rubygems'
 require 'mechanize'
@@ -14,6 +13,9 @@ require 'httparty'
 
 def searchmelcat
 headers['Access-Control-Allow-Origin'] = "*"
+headers['Access-Control-Allow-Origin'] = "*"
+headers['Access-Control-Request-Method'] = "*"
+headers['Access-Control-Allow-Headers'] = "*"
 if params[:q].present?
 @searchquery = params[:q]
 @searchqueryclearned = CGI::escape(@searchquery)    
