@@ -1,4 +1,9 @@
 class MelcatController < ApplicationController
+
+after_filter :set_access_control_headers
+
+
+
 respond_to :html, :json
 require 'rubygems'
 require 'mechanize'
@@ -8,14 +13,15 @@ require 'oj'
 require 'nikkou'
 require 'httparty'
 
-
+def set_access_control_headers 
+headers['Access-Control-Allow-Origin'] = '*' 
+headers['Access-Control-Request-Method'] = '*'
+end
 
 
 def searchmelcat
-headers['Access-Control-Allow-Origin'] = "*"
-headers['Access-Control-Allow-Origin'] = "*"
-headers['Access-Control-Request-Method'] = "*"
-headers['Access-Control-Allow-Headers'] = "*"
+headers['Access-Control-Allow-Origin'] = '*' 
+headers['Access-Control-Request-Method'] = '*'
 if params[:q].present?
 @searchquery = params[:q]
 @searchqueryclearned = CGI::escape(@searchquery)    
