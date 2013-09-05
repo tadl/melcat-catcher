@@ -316,69 +316,14 @@ end
 @shelvinglocations_filtered = @shelvinglocations.compact.uniq
 end
 
-
-
-
 respond_to do |format|
 format.json { render :json => Oj.dump(items: @record_details, shelvinglocations: @shelvinglocations_filtered)  }
 end
 end
 
-def itemdetails
-headers['Access-Control-Allow-Origin'] = "*"
-@gottem = "gottem"
-@nope = "nope"
-@record_id = params[:record_id]
-@pagetitle = 'http://catalog.tadl.org/eg/opac/record/' + @record_id + '?locg=22;copy_offset=0;copy_limit=75'
-url = @pagetitle
-@doc = Nokogiri::HTML(open(url)) 
-@record_details = @doc.css("#main-content").map do |detail|
-{
-item:
-{
-:author => detail.at_css(".rdetail_authors_div").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
-:title => detail.at_css("#rdetail_title").text,
-:summary => detail.at_css("#rdetail_summary_from_rec").try(:text).try(:strip),
-:record_id => @record_id,
-:copies_available => detail.at_css(".rdetail_aux_copycounts").try(:text).try(:strip).try(:gsub!, /available in District./," ").try(:squeeze, " ").try(:strip),
-:copies_total => detail.at_css(".rdetail_aux_holdcounts").try(:text).try(:strip).try(:split, "on ").try(:last).try(:gsub, /copies./," ").try(:gsub, /copy./," ").try(:strip),
-:eresource => detail.at_css('/div[2]/p/a').try(:attr, "href"),
-:image => detail.at_css('#rdetail_image').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:format_icon => detail.at_css('.format_icon/img').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:record_year => detail.search('span[@itemprop="datePublished"]').try(:text),
-
-}
-}
-end
-
-if @doc.css('//table#rdetails_status//tr').present?
-@shelvinglocations = @doc.css('//table#rdetails_status//tr')[1..-1].map do |detail|
-if detail.at_css("td[4]").try(:text).try(:squeeze, " ") == "Available" || detail.at_css("td[4]").try(:text).try(:squeeze, " ") == "Reshelving"
-{
-shelf_location:
-{
-:library => detail.at_css("td[1]").try(:text).try(:squeeze, " "),
-:shelving_location => detail.at_css("td[3]").try(:text).try(:squeeze, " "),
-:call_number => detail.at_css("td[2]").try(:text).try(:squeeze, " "),
-:available => detail.at_css("td[4]").try(:text).try(:squeeze, " "),
-}
-}
-end
-end
-@shelvinglocations_filtered = @shelvinglocations.compact.uniq
-end
-
-
-
-
-respond_to do |format|
-format.json { render :json => Oj.dump(items: @record_details, shelvinglocations: @shelvinglocations_filtered)  }
-end
-end
 
 def itemonshelf
 headers['Access-Control-Allow-Origin'] = "*"
-
 @record_id = params[:record_id]
 @pagetitle = 'http://catalog.tadl.org/eg/opac/record/' + @record_id + '?locg=22;copy_offset=0;copy_limit=75'
 url = @pagetitle
@@ -396,14 +341,9 @@ item:
 :available => detail.at_css("td[4]").try(:text).try(:squeeze, " "),
 }
 }
-
-
-
 end
 end
-
 @filtered = @record_details.compact
-
 respond_to do |format|
 format.json { render :json => Oj.dump(items: @filtered.uniq)  }
 end

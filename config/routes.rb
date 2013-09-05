@@ -16,6 +16,7 @@ Ilscatcher::Application.routes.draw do
   get "melcat/searchmelcat"
   get "melcat/showmelcat"
   get "melcat/testmelcat"
+  get "melcat/hold"
   root :to => 'main#index'
   
   match ':controller/:action/:pagenumber/:querytitle'
