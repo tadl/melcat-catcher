@@ -373,6 +373,40 @@ format.json { render :json => Oj.dump(:message => @confirm_message)  }
 end
 end
 
+def multihold
+headers['Access-Control-Allow-Origin'] = "*"
+@username = params[:u]
+@password = params[:pw]
+@record_id = params[:record_id]
+@split_ids = @record_id.split(",").map(&:strip).reject(&:empty?)
+@split_formated = @split_ids.map! { |k| "&hold_target=#{k}" }.join
+agent = Mechanize.new
+page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
+page.forms.class == Array
+form = agent.page.forms[1]
+form.field_with(:name => "username").value = @username
+form.field_with(:name => "password").value = @password
+results = agent.submit(form)
+holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?hold_type=T&loc=22'+@split_formated)
+holdform = agent.page.forms[1]  
+holdconfirm = agent.submit(holdform)
+@doc = holdconfirm.parser
+@confirm_message = @doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
+@record_details = @doc.css('//table#hold-items-list//tr').map do |detail|
+{
+item:
+{
+:record_id => detail.at_css("td[1]//input").try(:attr, "value"),
+:title => detail.at_css("td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:first),
+:message => detail.at_css("td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last),
+}
+}
+end
+respond_to do |format|
+format.json { render :json => Oj.dump(:items => @record_details)  }
+end
+end
+
 
 def renew
 headers['Access-Control-Allow-Origin'] = "*"

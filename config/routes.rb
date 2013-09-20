@@ -4,6 +4,7 @@ Ilscatcher::Application.routes.draw do
   get "main/itemdetails"
   get "main/about"
   get "main/hold"
+  get "main/multihold"
   get "main/renew"
   get "main/login"
   get "main/showcheckouts"
