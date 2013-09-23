@@ -402,8 +402,9 @@ item:
 }
 }
 end
+
 respond_to do |format|
-format.json { render :json => Oj.dump(:items => @record_details)  }
+format.json { render :json => {:items => @record_details}  }
 end
 end
 
