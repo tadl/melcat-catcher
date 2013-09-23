@@ -393,14 +393,13 @@ holdconfirm = agent.submit(holdform)
 @doc = holdconfirm.parser
 @confirm_message = @doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
 @record_details = @doc.css('//table#hold-items-list//tr').map do |detail|
-{
-item:
+
 {
 :record_id => detail.at_css("td[1]//input").try(:attr, "value"),
 :title => detail.at_css("td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:first),
 :message => detail.at_css("td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last),
 }
-}
+
 end
 
 respond_to do |format|
