@@ -623,6 +623,99 @@ format.json { render :json => { :barcode => @barcode}}
 end
 end
 
+def search_prefs
+headers['Access-Control-Allow-Origin'] = "*"
+@username = params[:u]
+@password = params[:pw]
+agent = Mechanize.new
+page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
+form = agent.page.forms[1]
+form.field_with(:name => "username").value = @username
+form.field_with(:name => "password").value = @password
+results = agent.submit(form)
+page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_settings")
+@doc = page.parser
+@pagetitle = @doc.css("title").text
+@hits_setting = @doc.css('select[@name="opac.hits_per_page"] option[@selected="selected"]').attr('value').text
+@search_setting = @doc.css('select[@name="opac.default_search_location"] option[@selected="selected"]').attr('value').text
+@pickup_setting = @doc.css('select[@name="opac.default_pickup_location"] option[@selected="selected"]').attr('value').text
+if @doc.css('input[@name="history.circ.retention_start"]').attr('checked')
+@circ_setting = "on"
+else
+@circ_setting = "off"
+end
+if @doc.css('input[@name="history.hold.retention_start"]').attr('checked')
+@hold_setting = "on"
+else
+@hold_setting = "off"
+end
+
+if params[:change] == "true"
+
+if params[:hits].present? 
+@hits = params[:hits]
+else
+@hits = @hits_setting
+end
+if params[:search].present? 
+@search = params[:search]
+else
+@search = @search_setting
+end
+if params[:pickup].present? 
+@pickup = params[:pickup]
+else
+@pickup = @pickup_setting
+end
+if params[:circ].present? 
+@circ = params[:circ]
+else
+@circ = @circ_setting
+end
+if params[:hold].present? 
+@hold = params[:hold]
+else
+@hold = @hold_setting
+end
+
+
+
+attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_settings', { 
+"opac.hits_per_page" => @hits,
+"opac.default_search_location" => @search,
+"opac.default_pickup_location" => @pickup,
+"history.circ.retention_start" => @circ,
+"history.hold.retention_start" => @hold,
+
+})
+
+
+page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_settings")
+@doc = page.parser
+@pagetitle = @doc.css("title").text
+@hits_setting = @doc.css('select[@name="opac.hits_per_page"] option[@selected="selected"]').attr('value').text
+@search_setting = @doc.css('select[@name="opac.default_search_location"] option[@selected="selected"]').attr('value').text
+@pickup_setting = @doc.css('select[@name="opac.default_pickup_location"] option[@selected="selected"]').attr('value').text
+
+if @doc.css('input[@name="history.circ.retention_start"]').attr('checked')
+@circ_setting = "on"
+else
+@circ_setting = "off"
+end
+if @doc.css('input[@name="history.hold.retention_start"]').attr('checked')
+@hold_setting = "on"
+else
+@hold_setting = "off"
+end
+
+end
+
+respond_to do |format|
+format.json { render :json => { :hits => @hits_setting, :search => @search_setting, :pickup => @pickup_setting, :circ => @circ_setting, :hold => @hold_setting }}
+end
+end
+
+
 def checkupdates
 headers['Access-Control-Allow-Origin'] = "*"
 @version_id = params[:version_id].to_i
