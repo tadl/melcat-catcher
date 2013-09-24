@@ -710,8 +710,17 @@ end
 
 end
 
+
+
+
+
+
+
+
+
+
 respond_to do |format|
-format.json { render :json => { :hits => @hits_setting, :search => @search_setting, :pickup => @pickup_setting, :circ => @circ_setting, :hold => @hold_setting }}
+format.json { render :json => { :settings => { :hits => @hits_setting, :search => @search_setting, :pickup => @pickup_setting, :circ => @circ_setting, :hold => @hold_setting } } }
 end
 end
 
