@@ -351,6 +351,23 @@ format.json { render :json => Oj.dump(items: @filtered.uniq)  }
 end
 end
 
+def marc
+headers['Access-Control-Allow-Origin'] = "*"
+@record_id = params[:record_id]
+@pagetitle = 'http://catalog.tadl.org/eg/opac/record/' + @record_id + '?expand=marchtml#marchtml'
+url = @pagetitle
+agent = Mechanize.new
+itempage = agent.get(url)
+@doc = itempage.parser
+@marc = @doc.at_css('.marc_table').to_s.gsub(/\n/,'').gsub(/\t/,'')
+
+respond_to do |format|
+format.json { render :json => {:marc => @marc}}
+end
+
+end
+
+
 
 def hold
 headers['Access-Control-Allow-Origin'] = "*"
