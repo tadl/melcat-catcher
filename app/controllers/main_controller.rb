@@ -301,7 +301,7 @@ item:
 :publisher => detail.search('span[@itemprop="publisher"]').try(:text),
 :isbn => detail.search('span[@itemprop="isbn"]').to_s.try(:gsub, "<span class=\"rdetail_value\" itemprop=\"isbn\">", "").try(:gsub, "</span>", ", "),
 :physical_description => detail.at('td:contains("Physical Description")').next_element.text,
-:related_subjects => detail.at('td:contains("Subject:")').next_element.to_s.strip.try(:gsub, /\n/, "").gsub('<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').gsub('"query=',"'").gsub('subject"',"#{fix}"),
+:related_subjects => detail.at('td:contains("Subject:")').try(:next_element).try(:to_s).try(:strip).try(:gsub, /\n/, "").try(:gsub,'<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').try(:gsub, '"query=',"'").try( :gsub, 'subject"',"#{fix}"),
 }
 }
 end
