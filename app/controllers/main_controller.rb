@@ -279,6 +279,7 @@ def itemdetails
 headers['Access-Control-Allow-Origin'] = "*"
 @gottem = "gottem"
 @nope = "nope"
+fix = %q[subject')"]
 @record_id = params[:record_id]
 @pagetitle = 'http://catalog.tadl.org/eg/opac/record/' + @record_id + '?locg=22;copy_offset=0;copy_limit=75'
 url = @pagetitle
@@ -297,6 +298,10 @@ item:
 :image => detail.at_css('#rdetail_image').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
 :format_icon => detail.at_css('.format_icon/img').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
 :record_year => detail.search('span[@itemprop="datePublished"]').try(:text),
+:publisher => detail.search('span[@itemprop="publisher"]').try(:text),
+:isbn => detail.search('span[@itemprop="isbn"]').to_s.try(:gsub, "<span class=\"rdetail_value\" itemprop=\"isbn\">", "").try(:gsub, "</span>", ", "),
+:physical_description => detail.at('td:contains("Physical Description")').next_element.text,
+:related_subjects => detail.at('td:contains("Subject:")').next_element.to_s.strip.try(:gsub, /\n/, "").gsub('<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').gsub('"query=',"'").gsub('subject"',"#{fix}"),
 }
 }
 end
