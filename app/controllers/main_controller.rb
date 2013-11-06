@@ -172,9 +172,12 @@ if params[:st] == "KEYWORD"
 elsif params[:st] == "TITLE"
 @searchby = "&qtype=title"
 @stdefault = "TITLE"
-elsif params[:st] == "AUTHOR/ARTIST"
+elsif params[:st] == "author"
 @searchby = "&qtype=author"
 @stdefault = "AUTHOR/ARTIST"
+elsif params[:st] == "SUBJECT"
+@searchby = "&qtype=subject"
+@stdefault = "SUBJECT"
 end
 else
 @searchby = "&qtype=keyword"
@@ -324,7 +327,7 @@ end
 end
 
 respond_to do |format|
-format.json { render :json => Oj.dump(items: @record_details, shelvinglocations: @shelvinglocations_filtered)  }
+format.json { render :json =>{:items => @record_details, :shelvinglocations => @shelvinglocations_filtered }}
 end
 end
 
