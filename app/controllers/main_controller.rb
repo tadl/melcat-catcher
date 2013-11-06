@@ -288,8 +288,7 @@ fix = %q[subject')"]
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url)) 
 @record_details = @doc.css("#main-content").map do |detail|
-{
-item:
+
 {
 :author => detail.at_css(".rdetail_authors_div").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
 :title => detail.at_css("#rdetail_title").text,
@@ -306,7 +305,7 @@ item:
 :physical_description => detail.at('td:contains("Physical Description")').next_element.text,
 :related_subjects => detail.at('td:contains("Subject:")').try(:next_element).try(:to_s).try(:strip).try(:gsub, /\n/, "").try(:gsub,'<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').try(:gsub, '"query=',"'").try( :gsub, 'subject"',"#{fix}"),
 }
-}
+
 end
 
 if @doc.css('//table#rdetails_status//tr').present?
