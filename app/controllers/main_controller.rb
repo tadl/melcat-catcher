@@ -298,7 +298,7 @@ url = @pagetitle
 :copies_total => detail.at_css(".rdetail_aux_holdcounts").try(:text).try(:strip).try(:split, "on ").try(:last).try(:gsub, /copies./," ").try(:gsub, /copy./," ").try(:strip),
 :eresource => detail.at_css('/div[2]/p/a').try(:attr, "href"),
 :image => detail.at_css('#rdetail_image').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:format_icon => detail.at_css('.format_icon/img').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+:format_icon => detail.at_css('.format_icon/img').try(:attr, "src").try(:gsub, "/images/format_icons/item_type/", ""),
 :record_year => detail.search('span[@itemprop="datePublished"]').try(:text),
 :publisher => detail.search('span[@itemprop="publisher"]').try(:text),
 :isbn => detail.search('span[@itemprop="isbn"]').to_s.try(:gsub, "<span class=\"rdetail_value\" itemprop=\"isbn\">", "").try(:gsub, "</span>", ", "),
