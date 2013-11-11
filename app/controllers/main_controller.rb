@@ -166,16 +166,16 @@ if params[:mt].present?
 end
 
 if params[:st].present? 
-if params[:st] == "KEYWORD"
+if params[:st] == "keyword"
 @searchby = "&qtype=keyword"
 @stdefault = "KEYWORD"
-elsif params[:st] == "TITLE"
+elsif params[:st] == "title"
 @searchby = "&qtype=title"
 @stdefault = "TITLE"
 elsif params[:st] == "author"
 @searchby = "&qtype=author"
 @stdefault = "AUTHOR/ARTIST"
-elsif params[:st] == "SUBJECT"
+elsif params[:st] == "subject"
 @searchby = "&qtype=subject"
 @stdefault = "SUBJECT"
 end
