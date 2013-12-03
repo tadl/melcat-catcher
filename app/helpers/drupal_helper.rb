@@ -1,0 +1,2 @@
+module DrupalHelper
+end
