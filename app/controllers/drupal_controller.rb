@@ -8,14 +8,22 @@ require 'oj'
 require 'nikkou'
 require 'dalli'
 require 'memcachier'
+require 'timeout'
+
 caches_action :test, :race_condition_ttl => 2.minutes
+
+def drupal
+payload = Rails.cache.read('test')
+respond_to do |format|
+format.json { render :json => payload }
+end
+end
 
 
 
 def test
 headers['Access-Control-Allow-Origin'] = "*"
 timestamp = Time.now.to_s
- Timeout::timeout(70) do
 books_featured_fiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/67/json").read)
 books_featured_nonfiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/68/json").read)
 books_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Books/json").read)
@@ -47,32 +55,6 @@ teens_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/format
 teens_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Teens/json").read)
 teens_homework = JSON.parse(open("https://www.tadl.org/export/node/json/409").read)
 teens_lists = JSON.parse(open("https://www.tadl.org/export/node/json/12784").read)
-hours_pcl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/plc").read)
-hours_ebb = JSON.parse(open("https://www.tadl.org/mobile/export/locations/ebb").read)
-hours_kbl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/kbl").read)
-hours_ipl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/ipl").read)
-hours_flpl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/flpl").read)
-hours_wood = JSON.parse(open("https://www.tadl.org/mobile/export/locations/wood").read)
-infobox_pcl = JSON.parse(open("https://www.tadl.org/export/node/json/583").read)
-infobox_ebb = JSON.parse(open("https://www.tadl.org/export/node/json/5439").read)
-infobox_kbl = JSON.parse(open("https://www.tadl.org/export/node/json/23123").read)
-infobox_ipl = JSON.parse(open("https://www.tadl.org/export/node/json/580").read)
-infobox_flpl = JSON.parse(open("https://www.tadl.org/export/node/json/578").read)
-infobox_wood = JSON.parse(open("https://www.tadl.org/export/node/json/5439").read)
-featured_news = JSON.parse(open("https://www.tadl.org/export/news/json").read)
-events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/all").read)
-events_pcl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/24").read)
-events_ebb = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/19").read)
-events_kbl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/22").read)
-events_ipl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/21").read)
-events_flpl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/20").read)
-events_wood = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/25").read)
-news_pcl = JSON.parse(open("https://www.tadl.org/export/news/location/json/24").read) 
-news_ebb = JSON.parse(open("https://www.tadl.org/export/news/location/json/19").read) 
-news_kbl = JSON.parse(open("https://www.tadl.org/export/news/location/json/22").read) 
-news_ipl = JSON.parse(open("https://www.tadl.org/export/news/location/json/21").read) 
-news_flpl = JSON.parse(open("https://www.tadl.org/export/news/location/json/20").read) 
-news_wood = JSON.parse(open("https://www.tadl.org/export/news/location/json/25").read) 
 
 respond_to do |format|
 format.json { render :json => { :time => timestamp, 
@@ -108,37 +90,13 @@ format.json { render :json => { :time => timestamp,
 	:teens_homework => teens_homework,
 	:teens_lists => teens_lists,	
 	:featured_news => featured_news,
-	:events => events,
 	:music_hot => music_hot,
-	:hours_pcl => hours_pcl,
-	:hours_ebb => hours_ebb,
-	:hours_kbl => hours_kbl,
-	:hours_ipl => hours_ipl,
-	:hours_flpl => hours_flpl,
-	:hours_wood => hours_wood,
-	:infobox_pcl => infobox_pcl,
-	:infobox_ebb => infobox_ebb,
-	:infobox_kbl => infobox_kbl,
-	:infobox_ipl => infobox_ipl,
-	:infobox_flpl => infobox_flpl,
-	:infobox_wood => infobox_wood,
-	:events_pcl => events_pcl,
-	:events_ebb => events_ebb,
-	:events_kbl => events_kbl,
-	:events_ipl => events_ipl,
-	:events_flpl => events_flpl,
-	:events_wood => events_wood,
-	:news_pcl => news_pcl,
-	:news_ebb => news_ebb,
-	:news_kbl => news_kbl,
-	:news_ipl => news_ipl,
-	:news_flpl => news_flpl,
-	:news_wood => news_wood,
+
 	}}
 end
 
 end
-end
+
 
 
 end
