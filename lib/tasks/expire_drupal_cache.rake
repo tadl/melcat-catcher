@@ -1,7 +1,5 @@
-namespace :db do
 desc "Expire and regenerate cache"
 task :recreate => :environment do
-expire_action(:controller => 'pages', :action => 'menus')
+expire_action(:controller => 'drupal', :action => 'test')
 `curl https://mel-catcher.herokuapp.com/drupal/test.json` 
-end
 end
