@@ -10,6 +10,8 @@ require 'dalli'
 require 'memcachier'
 caches_action :test, :race_condition_ttl => 2.minutes
 
+
+
 def test
 headers['Access-Control-Allow-Origin'] = "*"
 timestamp = Time.now.to_s
@@ -135,13 +137,6 @@ format.json { render :json => { :time => timestamp,
 end
 
 end
-
-
-
-
-
-
-
 
 
 
