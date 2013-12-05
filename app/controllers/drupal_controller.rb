@@ -15,6 +15,7 @@ caches_action :test, :race_condition_ttl => 2.minutes
 def test
 headers['Access-Control-Allow-Origin'] = "*"
 timestamp = Time.now.to_s
+ Timeout::timeout(70) do
 books_featured_fiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/67/json").read)
 books_featured_nonfiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/68/json").read)
 books_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Books/json").read)
@@ -137,7 +138,7 @@ format.json { render :json => { :time => timestamp,
 end
 
 end
-
+end
 
 
 end
