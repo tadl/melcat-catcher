@@ -20,9 +20,7 @@ Ilscatcher::Application.configure do
   # Generate digests for assets URLs
   config.assets.digest = true
 
-config.after_initialize do 
-  Delayed::Job.scaler = :heroku_cedar
-end
+
   
 
   # Defaults to nil and saved in location specified by config.assets.prefix
