@@ -18,6 +18,7 @@ books_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Books/json"
 books_adult_display = JSON.parse(open("https://www.tadl.org/mobile/export/items/45/all/json").read)
 books_adult_clubkits = JSON.parse(open("https://www.tadl.org/mobile/export/items/224/all/json").read)
 books_adult_business = JSON.parse(open("https://www.tadl.org/mobile/export/items/234/all/json").read)
+books_book_list = JSON.parse(open("https://www.tadl.org/export/node/json/80").read)
 music_new = JSON.parse(open("https://www.tadl.org/mobile/export/items/29/json").read)
 music_hot = JSON.parse(open("https://www.tadl.org/mobile/export/items/31/json").read)
 music_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Music/json").read)
@@ -78,6 +79,7 @@ bingo = { :time => timestamp,
 	:books_adult_clubkits => books_adult_clubkits,
 	:books_adult_business => books_adult_business,
 	:books_reviews => books_reviews,
+	:books_book_list => books_book_list,  
 	:music_new => music_new, 
 	:music_hot => music_hot,
 	:muisc_reviews => music_reviews,
