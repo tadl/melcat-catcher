@@ -22,7 +22,8 @@ Ilscatcher::Application.routes.draw do
   get "main/marc"
   get "drupal/test"
   get "drupal/drupal"
-    get "drupal/library_reads"
+  get "drupal/library_reads"
+  get "drupal/ny_list"  
   root :to => 'main#index'
   
   match ':controller/:action/:pagenumber/:querytitle'
