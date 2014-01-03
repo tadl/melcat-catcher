@@ -12,7 +12,7 @@ require 'timeout'
 require 'json'
 
 before_filter :set_cache_headers, :only => [:drupal] 
-
+caches_action :drupal, :expires_in => 9.minutes, :race_condition_ttl => 1.minutes
 
 
 
