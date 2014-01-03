@@ -1,5 +1,5 @@
 desc "Expire and regenerate cache"
-task :recreate => :environment do
+task :library_reads => :environment do
 require 'rubygems'
 require 'mechanize'
 require 'nokogiri'
