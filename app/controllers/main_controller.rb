@@ -314,9 +314,9 @@ if detail.at_css("td[4]").try(:text).try(:squeeze, " ") == "Available" || detail
 {
 shelf_location:
 {
-:library => detail.at_css("td[1]").try(:text).try(:squeeze, " "),
+:library => detail.at_css("td[1]").try(:text).try(:rstrip),
 :shelving_location => detail.at_css("td[3]").try(:text).try(:squeeze, " "),
-:call_number => detail.at_css("td[2]").try(:text).try(:squeeze, " "),
+:call_number => detail.at_css("td[2]").try(:text).try(:rstrip),
 :available => detail.at_css("td[4]").try(:text).try(:squeeze, " "),
 }
 }
