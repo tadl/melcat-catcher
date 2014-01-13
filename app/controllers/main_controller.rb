@@ -675,6 +675,28 @@ else
 @hold_setting = "off"
 end
 
+page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_notify")
+@doc = page.parser
+if @doc.css('input[@name="opac.hold_notify.email"]').attr('checked')
+@hold_notify_email = "on"
+else
+@hold_notify_email = "off"
+end
+
+if @doc.css('input[@name="opac.hold_notify.phone"]').attr('checked')
+@hold_notify_phone = "on"
+else
+@hold_notify_phone = "off"
+end
+page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs")
+@doc = page.parser
+@default_phone = @doc.at_css('td:contains("Day Phone")').try(:next_element).try(:text)
+@opac_username = @doc.at_css('td:contains("Username")').try(:next_element).try(:text)
+@email_address = @doc.at_css('td:contains("Email Address")').try(:next_element).try(:text)
+@hold_shelf_alias = @doc.at_css('td:contains("Holdshelf Alias")').try(:next_element).try(:text)
+
+
+
 if params[:change] == "true"
 
 if params[:hits].present? 
@@ -740,12 +762,19 @@ end
 
 
 
-
-
-
-
 respond_to do |format|
-format.json { render :json => { :settings => { :hits => @hits_setting, :search => @search_setting, :pickup => @pickup_setting, :circ => @circ_setting, :hold => @hold_setting } } }
+format.json { render :json => { :settings => {  
+:search => @search_setting, 
+:pickup => @pickup_setting, 
+:circ => @circ_setting, 
+:hold => @hold_setting, 
+:hold_notify_email => @hold_notify_email,
+:hold_notify_phone => @hold_notify_phone,
+:default_phone => @default_phone,
+:opac_username => @opac_username,
+:hold_shelf_alias => @hold_shelf_alias,
+:email_address => @email_address,
+} } }
 end
 end
 
