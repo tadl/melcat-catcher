@@ -523,7 +523,7 @@ end
 else
 
 respond_to do |format|
-format.json { render :json => Oj.dump(users: @user)  }
+format.json { render :json => { :users => @user }}
 end
 end
 end
