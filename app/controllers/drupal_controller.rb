@@ -12,7 +12,7 @@ require 'timeout'
 require 'json'
 
 before_filter :set_cache_headers, :only => [:drupal] 
-caches_action :drupal, :expires_in => 9.minutes, :race_condition_ttl => 1.minutes
+caches_action :drupal, :cache_path => Proc.new { |c| c.params }, :expires_in => 9.minutes, :race_condition_ttl => 1.minutes
 
 
 
@@ -25,12 +25,16 @@ end
 def drupal
 	if params[:content] == 'home'
 		payload = Rails.cache.read('home')
-	else
-		payload = Rails.cache.read('everything_else')
-	end
-	respond_to do |format|
+			respond_to do |format|
 		format.json { render :json => payload }
 	end
+	else
+		payload = Rails.cache.read('everything_else')
+			respond_to do |format|
+		format.json { render :json => payload }
+	end
+	end
+
 end
 
 def ny_list
