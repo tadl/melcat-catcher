@@ -23,10 +23,14 @@ def set_cache_headers
 end
 
 def drupal
-payload = Rails.cache.read('test')
-respond_to do |format|
-format.json { render :json => payload }
-end
+	if params[:content] == 'home'
+		payload = Rails.cache.read('home')
+	else
+		payload = Rails.cache.read('everything_else')
+	end
+	respond_to do |format|
+		format.json { render :json => payload }
+	end
 end
 
 def ny_list

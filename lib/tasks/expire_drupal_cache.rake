@@ -71,8 +71,17 @@ news_ipl = JSON.parse(open("https://www.tadl.org/export/news/location/json/21").
 news_flpl = JSON.parse(open("https://www.tadl.org/export/news/location/json/20").read) 
 news_wood = JSON.parse(open("https://www.tadl.org/export/news/location/json/25").read) 
 
+home = {
+	:featured_news => featured_news,
+	:events => events,
+	:books_featured_fiction => books_featured_fiction, 
+	:books_featured_nonfiction => books_featured_nonfiction,
+	:videos_new => videos_new,
+	:music_new => music_new,
+}
 
-bingo = { :time => timestamp, 
+
+everything_else = { :time => timestamp, 
 	:books_featured_fiction => books_featured_fiction, 
 	:books_featured_nonfiction => books_featured_nonfiction, 
 	:books_adult_display => books_adult_display,
@@ -134,8 +143,8 @@ bingo = { :time => timestamp,
 	}
 
 
-Rails.cache.write("test", bingo)
-
+Rails.cache.write("everything_else", everything_else)
+Rails.cache.write("home", home)
 
 
 
