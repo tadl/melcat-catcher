@@ -12,6 +12,7 @@ require 'timeout'
 
 
 timestamp = Time.now.to_s
+adult_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/26").read)
 books_featured_fiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/67/json").read)
 books_featured_nonfiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/68/json").read)
 books_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Books/json").read)
@@ -81,7 +82,8 @@ home = {
 }
 
 
-everything_else = { :time => timestamp, 
+everything_else = { :time => timestamp,
+	:events_adults => adult_events,
 	:books_featured_fiction => books_featured_fiction, 
 	:books_featured_nonfiction => books_featured_nonfiction, 
 	:books_adult_display => books_adult_display,
