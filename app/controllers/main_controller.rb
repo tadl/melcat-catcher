@@ -191,7 +191,7 @@ else
 end
 
 if params[:facet].present?
-@facet = params[:facet]
+@facet = '&facet=' + params[:facet]
 else
 @facet = ""
 end
@@ -200,12 +200,12 @@ end
   
 if params[:q].present? 
 
-@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=10'+ @sorttype +'&page='+ @nextpage +'&'+@facet 
+@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=20'+ @sorttype +'&page='+ @nextpage +'&'+@facet 
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
 elsif params[:mt].present?
-@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=&qtype=keyword&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=10'+ @sorttype +'&page='+ @nextpage +'&facet='+ @facet
+@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=&qtype=keyword&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=20'+ @sorttype +'&page='+ @nextpage + @facet
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))  
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
