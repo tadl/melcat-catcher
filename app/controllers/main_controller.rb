@@ -200,7 +200,7 @@ end
   
 if params[:q].present? 
 
-@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=20'+ @sorttype +'&page='+ @nextpage +'&'+@facet 
+@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=20'+ @sorttype +'&page='+ @nextpage + @facet 
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
