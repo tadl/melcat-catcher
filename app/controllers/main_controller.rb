@@ -191,7 +191,7 @@ else
 end
 
 if params[:facet].present?
-@facet = '&facet=' + params[:facet]
+@facet = params[:facet]
 else
 @facet = ""
 end
