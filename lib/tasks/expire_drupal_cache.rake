@@ -137,6 +137,24 @@ teens = {
 	:teens_lists => teens_lists,
 }
 
+lists = {
+	:teens_new => teens_new,
+	:teens_manga => teens_manga,
+	:youth_display => youth_display, 
+	:youth_new_books => youth_new_books,
+	:videos_new => videos_new,
+	:videos_hot => videos_hot,
+	:videos_tcff => videos_tcff,
+	:videos_met => videos_met,
+	:music_new => music_new, 
+	:music_hot => music_hot,
+	:books_featured_fiction => books_featured_fiction, 
+	:books_featured_nonfiction => books_featured_nonfiction, 
+	:books_adult_display => books_adult_display,
+	:books_adult_clubkits => books_adult_clubkits,
+	:books_adult_business => books_adult_business,
+}
+
 
 everything_else = { :time => timestamp,
 	:events_adults => adult_events,
@@ -208,6 +226,8 @@ Rails.cache.write("music", music)
 Rails.cache.write("video", videos)
 Rails.cache.write("youth", youth)
 Rails.cache.write("teens", teens)
+Rails.cache.write("online", online)
+Rails.cache.write("lists", lists)
 
 
 
