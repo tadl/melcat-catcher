@@ -79,6 +79,62 @@ home = {
 	:books_featured_nonfiction => books_featured_nonfiction,
 	:videos_new => videos_new,
 	:music_new => music_new,
+	:hours_ebb => hours_ebb,
+	:hours_pcl => hours_pcl,
+	:hours_kbl => hours_kbl,
+	:hours_ipl => hours_ipl,
+	:hours_flpl => hours_flpl,
+	:hours_wood => hours_wood,
+}
+
+books = {
+	:books_featured_fiction => books_featured_fiction, 
+	:books_featured_nonfiction => books_featured_nonfiction, 
+	:books_adult_display => books_adult_display,
+	:books_adult_clubkits => books_adult_clubkits,
+	:books_adult_business => books_adult_business,
+	:books_reviews => books_reviews,
+	:books_book_list => books_book_list,  
+}
+
+music = {
+	:music_new => music_new, 
+	:music_hot => music_hot,
+	:music_reviews => music_reviews,
+	:music_links => music_links,
+}
+
+videos = {
+	:videos_new => videos_new,
+	:videos_hot => videos_hot,
+	:videos_tcff => videos_tcff,
+	:videos_met => videos_met,
+	:videos_reviews => video_reviews,
+}
+
+online = {
+	:online_mel => online_mel,
+	:online_resources => online_resources,
+	:online_legal => online_legal,
+	:online_ebooks => online_ebooks,
+}
+
+youth = {
+	:youth_display => youth_display, 
+	:youth_new_books => youth_new_books,
+	:youth_reviews => youth_reviews,
+	:events_youth => youth_events,
+	:youth_resources => youth_resources,
+	:youth_award_winners => youth_award_winners,
+}
+
+teens = {
+	:teens_new => teens_new,
+	:teens_manga => teens_manga,
+	:events_teens => teens_events,
+	:teens_reviews => teens_reviews,
+	:teens_homework => teens_homework,
+	:teens_lists => teens_lists,
 }
 
 
@@ -147,6 +203,11 @@ everything_else = { :time => timestamp,
 
 Rails.cache.write("everything_else", everything_else)
 Rails.cache.write("home", home)
+Rails.cache.write("books", books)
+Rails.cache.write("music", music)
+Rails.cache.write("video", videos)
+Rails.cache.write("youth", youth)
+Rails.cache.write("teens", teens)
 
 
 

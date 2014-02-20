@@ -23,8 +23,8 @@ def set_cache_headers
 end
 
 def drupal
-	if params[:content] == 'home'
-		payload = Rails.cache.read('home')
+	if params[:content] 
+		payload = Rails.cache.read(params[:content])
 			respond_to do |format|
 		format.json { render :json => payload }
 	end
