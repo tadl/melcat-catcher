@@ -155,6 +155,33 @@ lists = {
 	:books_adult_business => books_adult_business,
 }
 
+locations = {
+	:hours_ebb => hours_ebb,
+	:hours_pcl => hours_pcl,
+	:hours_kbl => hours_kbl,
+	:hours_ipl => hours_ipl,
+	:hours_flpl => hours_flpl,
+	:hours_wood => hours_wood,
+	:infobox_pcl => infobox_pcl,
+	:infobox_ebb => infobox_ebb,
+	:infobox_kbl => infobox_kbl,
+	:infobox_ipl => infobox_ipl,
+	:infobox_flpl => infobox_flpl,
+	:infobox_wood => infobox_wood,
+	:events_pcl => events_pcl,
+	:events_ebb => events_ebb,
+	:events_kbl => events_kbl,
+	:events_ipl => events_ipl,
+	:events_flpl => events_flpl,
+	:events_wood => events_wood,
+	:news_pcl => news_pcl,
+	:news_ebb => news_ebb,
+	:news_kbl => news_kbl,
+	:news_ipl => news_ipl,
+	:news_flpl => news_flpl,
+	:news_wood => news_wood,
+}
+
 
 everything_else = { :time => timestamp,
 	:events_adults => adult_events,
@@ -228,8 +255,7 @@ Rails.cache.write("youth", youth)
 Rails.cache.write("teens", teens)
 Rails.cache.write("online", online)
 Rails.cache.write("lists", lists)
-
-
+Rails.cache.write("locations", locations)
 
 
 
