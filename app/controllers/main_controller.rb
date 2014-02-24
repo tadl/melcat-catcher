@@ -779,6 +779,44 @@ end
 end
 
 
+def login(username, password)
+agent = Mechanize.new
+page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
+form = agent.page.forms[1]
+form.field_with(:name => "username").value = username
+form.field_with(:name => "password").value = password
+agent.submit(form)
+return agent
+end
+
+
+def create_list
+agent = login(params[:u],params[:pw])
+agent.post('/eg/opac/myopac/list/update?loc=22', { 
+"loc" => '22',
+"name" => params[:title],
+"action" => 'create',
+"description" => params[:desc],
+"shared" => params[:share]
+})
+list_page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?')
+doc = list_page.parser
+list_title = 'a:contains("'+params[:title]+'")'
+list_id = doc.at_css(list_title).attr('href').gsub('/eg/opac/myopac/lists?bbid=','')
+
+respond_to do |format|
+format.json { render :json =>{:list_id => list_id}}
+end
+
+
+end
+
+
+
+
+
+
+
 def checkupdates
 headers['Access-Control-Allow-Origin'] = "*"
 @version_id = params[:version_id].to_i
