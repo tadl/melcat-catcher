@@ -779,7 +779,7 @@ end
 end
 
 
-def login(username, password)
+def login_action(username, password)
 agent = Mechanize.new
 page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
 form = agent.page.forms[1]
@@ -791,7 +791,7 @@ end
 
 
 def create_list
-agent = login(params[:u],params[:pw])
+agent = login_action(params[:u],params[:pw])
 agent.post('/eg/opac/myopac/list/update?loc=22', { 
 "loc" => '22',
 "name" => params[:title],
@@ -807,7 +807,6 @@ list_id = doc.at_css(list_title).attr('href').gsub('/eg/opac/myopac/lists?bbid='
 respond_to do |format|
 format.json { render :json =>{:list_id => list_id}}
 end
-
 
 end
 
