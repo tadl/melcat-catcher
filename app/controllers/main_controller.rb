@@ -854,6 +854,9 @@ def get_list
 	page = agent.get(url)
 	doc = page.parser
 	
+	
+	list_name = doc.css(".result-bookbag-name").text
+	list_id = list_id
 	itemlist = doc.css(".result_table_row").map do |item| 
 		{
 		:title => item.at_css(".bigger").text.strip, 
@@ -874,7 +877,7 @@ def get_list
 	
 	
 	respond_to do |format|
-		format.json { render :json => itemlist }
+		format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist}}
 	end	
 	
 
