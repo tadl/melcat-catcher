@@ -40,7 +40,7 @@ youth_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/format
 youth_resources = JSON.parse(open("https://www.tadl.org/export/node/json/647").read)
 youth_award_winners = JSON.parse(open("https://www.tadl.org/export/node/json/644").read)
 teens_new = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19050").read)
-teens_manga = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19051").read)['items'].take(6)
+teens_manga = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19051").read)
 teens_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/28").read)
 teens_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Teens/json").read)
 teens_homework = JSON.parse(open("https://www.tadl.org/export/node/json/409").read)
