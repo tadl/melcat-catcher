@@ -42,8 +42,12 @@ GEM
     delayed_job (2.1.4)
       activesupport (~> 3.0)
       daemons
+    dish (0.0.3)
     domain_name (0.5.12)
       unf (>= 0.0.5, < 1.0.0)
+    dotenv (0.10.0)
+    dotenv-rails (0.10.0)
+      dotenv (= 0.10.0)
     erubis (2.7.0)
     excon (0.25.3)
     execjs (1.4.0)
@@ -167,6 +171,8 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   dalli
   delayed_job (~> 2.1.4)
+  dish
+  dotenv-rails
   httparty
   jquery-rails
   mechanize
