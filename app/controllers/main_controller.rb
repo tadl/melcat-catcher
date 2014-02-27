@@ -833,6 +833,64 @@ end
 
 end
 
+
+def get_list
+	if params[:page]
+	page = params[:page]
+	else
+	page = 0
+	end
+	if params[:available] == 'yes'
+	available = '&modifier=available'
+	else
+	available = ''
+	end
+	list_id = params[:list_id].to_s
+	page_number = page.to_s
+	
+	url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=24' + available +'&page='+ page_number +'&locg=22'
+	
+	agent = Mechanize.new
+	page = agent.get(url)
+	doc = page.parser
+	
+	itemlist = doc.css(".result_table_row").map do |item| 
+		{
+		:title => item.at_css(".bigger").text.strip, 
+		:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
+		:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+		:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
+		:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+		:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+		:abstract => item.at_css(".result_table_summary").text.strip.try(:squeeze, " "),
+		:record_year => item.at_css(".record_year").try(:text),
+		:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
+		}
+	end 
+	
+	
+	
+	
+	
+	
+	respond_to do |format|
+		format.json { render :json => itemlist }
+	end	
+	
+
+
+
+
+
+end
+
+
+
+
+
+
+
+
 def checkupdates
 headers['Access-Control-Allow-Origin'] = "*"
 @version_id = params[:version_id].to_i

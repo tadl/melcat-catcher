@@ -258,5 +258,4 @@ Rails.cache.write("lists", lists)
 Rails.cache.write("locations", locations)
 
 
-
 end

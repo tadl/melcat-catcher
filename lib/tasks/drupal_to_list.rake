@@ -1,4 +1,4 @@
-desc "Expire and regenerate cache"
+desc "Get Lists from Drupal Feeds and Turn Them into Evergreen Lists"
 task :drupal_to_list => :environment do
 require 'rubygems'
 require 'mechanize'

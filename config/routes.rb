@@ -21,6 +21,7 @@ Ilscatcher::Application.routes.draw do
   get "main/search_prefs"
   get "main/create_list"
   get "main/add_to_list"
+  get "main/get_list"
   get "main/marc"
   get "drupal/test"
   get "drupal/drupal"
