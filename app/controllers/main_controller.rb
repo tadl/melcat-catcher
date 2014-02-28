@@ -9,12 +9,15 @@ require 'nikkou'
 require 'dalli'
 require 'memcachier'
 
+before_filter :set_cache_headers, :only => [:get_list] 
+caches_action :get_list, :cache_path => Proc.new { |c| c.params }, :expires_in => 9.minutes, :race_condition_ttl => 1.minutes
+
+def set_cache_headers
+    headers['Access-Control-Allow-Origin'] = '*'      
+end
+
+def index
  
-caches_action :get_list, :cache_path => Proc.new { |c| c.params }, :expires_in => 9.minutes, :race_condition_ttl => 1.minutes, :access_control_allow_origin => '*'
-
-
-  def index
-  
 if params[:q].present?
 @searchquery = params[:q]
 @searchqueryclearned = CGI::escape(@searchquery)    
@@ -841,7 +844,6 @@ end
 
 
 def get_list
-	headers['Access-Control-Allow-Origin'] = "*"
 	if params[:page]
 	page = params[:page]
 	else
