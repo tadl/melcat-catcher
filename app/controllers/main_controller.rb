@@ -866,22 +866,28 @@ def get_list
 	
 	list_name = doc.css(".result-bookbag-name").text
 	list_id = list_id
-	itemlist = doc.css(".result_table_row").map do |item| 
-		{
-		:title => item.at_css(".bigger").text.strip, 
-		:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-		:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
-		:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
-		:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
-		:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-		:abstract => item.at_css(".result_table_summary").text.strip.try(:squeeze, " "),
-		:record_year => item.at_css(".record_year").try(:text),
-		:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
-		}
-	end 
+	if params[:just_ids] == 'yes'
 	
-	
-	
+		itemlist = doc.css(".result_table_row").map do |item| 
+			{
+			:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+			}
+		end 
+	else
+		itemlist = doc.css(".result_table_row").map do |item| 
+			{
+			:title => item.at_css(".bigger").text.strip, 
+			:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
+			:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+			:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
+			:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+			:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+			:abstract => item.at_css(".result_table_summary").text.strip.try(:squeeze, " "),
+			:record_year => item.at_css(".record_year").try(:text),
+			:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
+			}
+		end 
+	end
 	
 	
 	
