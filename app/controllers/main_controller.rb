@@ -868,7 +868,7 @@ def get_list
 	list_id = list_id
 	if params[:just_ids] == 'yes'
 	
-		itemlist = doc.css(".result_table_row").map do |item| 
+		itemlist = doc.css(".result_table_row").take(6).map do |item| 
 			{
 			:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
 			}
