@@ -6,9 +6,11 @@ require 'nokogiri'
 require 'open-uri'
 require 'oj'
 require 'nikkou'
+require 'dalli'
+require 'memcachier'
 
-
-caches_action :get_list, :cache_path => Proc.new { |c| c.params }, :expires_in => 5.minutes, :race_condition_ttl => 1.minutes
+ 
+caches_action :get_list, :cache_path => Proc.new { |c| c.params }, :expires_in => 9.minutes, :race_condition_ttl => 1.minutes, :access_control_allow_origin => '*'
 
 
   def index
