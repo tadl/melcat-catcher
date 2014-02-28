@@ -835,6 +835,7 @@ end
 
 
 def get_list
+	headers['Access-Control-Allow-Origin'] = "*"
 	if params[:page]
 	page = params[:page]
 	else
