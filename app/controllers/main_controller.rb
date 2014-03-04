@@ -659,14 +659,79 @@ end
 
 def search_prefs
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
+agent = login_action(params[:u],params[:pw])
+
+if params[:new_search_prefs]
+	options = params[:new_search_prefs].split(',')
+
+	if options[1] == 'true'
+	circ_retention = 'on'
+	else
+	circ_retention = 'off'
+	end
+	
+	if options[2] == 'true'
+	hold_retention = 'on'
+	else
+	hold_retention = 'off'
+	end
+	
+	
+	attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_settings', { 
+		"opac.default_pickup_location" => options[0],
+		"history.circ.retention_start" => circ_retention,
+		"history.hold.retention_start" => hold_retention,
+	})
+
+end
+
+if params[:new_email]	
+	attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/update_email', { 
+		"email" => params[:new_email],
+		"current_pw" => params[:pw],
+	})
+end
+
+if params[:new_alias]	
+	page = agent.get("https://catalog.tadl.org/eg/opac/myopac/update_alias")
+	form = agent.page.forms[1]
+	form.field_with(:name => "alias").value = params[:new_alias]
+	form.field_with(:name => "current_pw").value = params[:pw]
+	agent.submit(form)
+end
+
+if params[:new_username]
+
+
+end
+
+if params[:new_notify_prefs]
+	options = params[:new_notify_prefs].split(',')
+
+	if options[0] == 'true'
+	phone_notify = 'on'
+	else
+	phone_notify = 'off'
+	end
+	
+	if options[1] == 'true'
+	email_notify = 'on'
+	else
+	email_notify = 'off'
+	end
+	
+	
+	attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_notify', {
+		"opac.hold_notify.email" => email_notify,
+		"opac.hold_notify.phone" => phone_notify,
+	})
+
+end
+
+
+
+
+
 page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_settings")
 @doc = page.parser
 @pagetitle = @doc.css("title").text
@@ -706,65 +771,8 @@ page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs")
 
 
 
-if params[:change] == "true"
-
-if params[:hits].present? 
-@hits = params[:hits]
-else
-@hits = @hits_setting
-end
-if params[:search].present? 
-@search = params[:search]
-else
-@search = @search_setting
-end
-if params[:pickup].present? 
-@pickup = params[:pickup]
-else
-@pickup = @pickup_setting
-end
-if params[:circ].present? 
-@circ = params[:circ]
-else
-@circ = @circ_setting
-end
-if params[:hold].present? 
-@hold = params[:hold]
-else
-@hold = @hold_setting
-end
 
 
-
-attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_settings', { 
-"opac.hits_per_page" => @hits,
-"opac.default_search_location" => @search,
-"opac.default_pickup_location" => @pickup,
-"history.circ.retention_start" => @circ,
-"history.hold.retention_start" => @hold,
-
-})
-
-
-page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_settings")
-@doc = page.parser
-@pagetitle = @doc.css("title").text
-@hits_setting = @doc.css('select[@name="opac.hits_per_page"] option[@selected="selected"]').attr('value').text
-@search_setting = @doc.css('select[@name="opac.default_search_location"] option[@selected="selected"]').attr('value').text
-@pickup_setting = @doc.css('select[@name="opac.default_pickup_location"] option[@selected="selected"]').attr('value').text
-
-if @doc.css('input[@name="history.circ.retention_start"]').attr('checked')
-@circ_setting = "on"
-else
-@circ_setting = "off"
-end
-if @doc.css('input[@name="history.hold.retention_start"]').attr('checked')
-@hold_setting = "on"
-else
-@hold_setting = "off"
-end
-
-end
 
 
 
@@ -773,13 +781,11 @@ end
 
 respond_to do |format|
 format.json { render :json => { :settings => {  
-:search => @search_setting, 
 :pickup => @pickup_setting, 
 :circ => @circ_setting, 
 :hold => @hold_setting, 
 :hold_notify_email => @hold_notify_email,
 :hold_notify_phone => @hold_notify_phone,
-:default_phone => @default_phone,
 :opac_username => @opac_username,
 :hold_shelf_alias => @hold_shelf_alias,
 :email_address => @email_address,
