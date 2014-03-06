@@ -800,6 +800,7 @@ page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopa
 form = agent.page.forms[1]
 form.field_with(:name => "username").value = username
 form.field_with(:name => "password").value = password
+form.checkbox_with(:name => "persist").check
 agent.submit(form)
 return agent
 end
@@ -894,23 +895,45 @@ def get_list
 			}
 		end 
 	end
-	
-	
-	
 	respond_to do |format|
 		format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist}}
 	end	
-	
-
-
-
-
-
 end
 
 
+def get_token
+agent = login_action(params[:u],params[:pw])
+test = agent.cookies.detect { |t| t.name == 'ses' }
 
+	
+	
+	respond_to do |format|
+		format.json { render :json =>{:session_token => test }}
+	end	
+end
 
+def get_user_with_token
+	agent = Mechanize.new
+	cookie = Mechanize::Cookie.new('ses', params[:token])
+	cookie.domain = "catalog.tadl.org"
+	cookie.path = "/"
+	agent.cookie_jar.add!(cookie)
+	page = agent.get('http://catalog.tadl.org')
+	doc = page.parser
+	user_info = doc.css("body").map do |item| 
+	{
+	:name => item.at_css('#dash_user').try(:text).try(:strip),
+	:checkouts => item.at_css('#dash_checked').try(:text).try(:strip),
+	:holds => item.at_css('#dash_holds').try(:text).try(:strip),
+	:pickups => item.at_css('#dash_pickup').try(:text).try(:strip),
+	:fines => item.at_css('#dash_fines').try(:text).try(:strip),
+	}
+	end
+	respond_to do |format|
+		format.json { render :json =>{:user => user_info }}
+	end	
+
+end
 
 
 

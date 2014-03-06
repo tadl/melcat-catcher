@@ -28,6 +28,7 @@ urls_and_list_ids = [{"name" => "New Music", "url" => "https://www.tadl.org/mobi
 	{"name" => "Youth Display", "url" => "https://www.tadl.org/mobile/export/items/47/json/all/json", "list_id" => "19049"},
 	{"name" => "Teen New", "url" => "https://www.tadl.org/mobile/export/items/51/json", "list_id" => "19050"},
 	{"name" => "Manga", "url" => "https://www.tadl.org/mobile/export/items/41/json", "list_id" => "19051"},
+	{"name" => "Video Games", "url" => "https://www.tadl.org/mobile/export/items/505/all/json", "list_id" => "19103"}
 ]
 
 	urls_and_list_ids.each do |i|

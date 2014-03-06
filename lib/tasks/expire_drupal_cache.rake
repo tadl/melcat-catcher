@@ -28,6 +28,7 @@ videos_new = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.jso
 videos_hot = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19045&just_ids=yes").read)
 videos_tcff = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19046&just_ids=yes").read)
 videos_met = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19047&just_ids=yes").read)
+video_games = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19103&just_ids=yes").read)
 video_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Video/json").read)
 online_mel = JSON.parse(open("https://www.tadl.org/export/node/json/3373").read)
 online_resources = JSON.parse(open("https://www.tadl.org/export/node/json/3372").read)
@@ -109,6 +110,7 @@ videos = {
 	:videos_hot => videos_hot,
 	:videos_tcff => videos_tcff,
 	:videos_met => videos_met,
+	:video_games => video_games,
 	:videos_reviews => video_reviews,
 }
 
@@ -146,6 +148,7 @@ lists = {
 	:videos_hot => videos_hot,
 	:videos_tcff => videos_tcff,
 	:videos_met => videos_met,
+	:video_games => video_games,
 	:music_new => music_new, 
 	:music_hot => music_hot,
 	:books_featured_fiction => books_featured_fiction, 
@@ -200,6 +203,7 @@ everything_else = { :time => timestamp,
 	:videos_hot => videos_hot,
 	:videos_tcff => videos_tcff,
 	:videos_met => videos_met,
+	:video_games => video_games,
 	:videos_reviews => video_reviews,
 	:online_mel => online_mel,
 	:online_resources => online_resources,
