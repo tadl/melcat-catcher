@@ -269,6 +269,12 @@ facets:
 }
 end
 
+if @doc.css('.invisible:contains(" Next ")').present?
+	@more_results = 'false'
+else
+	@more_results = 'true'
+end
+
 
 
 if @itemlist.count == 0
@@ -281,7 +287,7 @@ end
 else
 
 respond_to do |format|
-format.json { render :json => {:items => @itemlist, :subjects => @subjectlist, :selected => @selectedfacets }}
+format.json { render :json => {:items => @itemlist, :subjects => @subjectlist, :selected => @selectedfacets, :more_results => @more_results }}
 end
 
 end
@@ -333,6 +339,7 @@ end
 end
 @shelvinglocations_filtered = @shelvinglocations.compact.uniq
 end
+
 
 respond_to do |format|
 format.json { render :json =>{:items => @record_details, :shelvinglocations => @shelvinglocations_filtered }}
