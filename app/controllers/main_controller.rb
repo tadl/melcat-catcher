@@ -914,20 +914,24 @@ end
 def get_token
 agent = login_action(params[:u],params[:pw])
 test = agent.cookies.detect { |t| t.name == 'ses' }
-
-	
-	
 	respond_to do |format|
 		format.json { render :json =>{:session_token => test }}
 	end	
 end
 
-def get_user_with_token
+
+def set_token(token)
 	agent = Mechanize.new
-	cookie = Mechanize::Cookie.new('ses', params[:token])
+	cookie = Mechanize::Cookie.new('ses', token)
 	cookie.domain = "catalog.tadl.org"
 	cookie.path = "/"
 	agent.cookie_jar.add!(cookie)
+	return agent
+end
+
+
+def get_user_with_token
+	agent = set_token(params[:token])
 	page = agent.get('http://catalog.tadl.org')
 	doc = page.parser
 	user_info = doc.css("body").map do |item| 
@@ -942,7 +946,37 @@ def get_user_with_token
 	respond_to do |format|
 		format.json { render :json =>{:user => user_info }}
 	end	
+end
 
+def get_user_lists
+	agent = set_token(params[:token])
+	page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists')
+	doc = page.parser
+	lists = doc.css('.bookbag-controls-holder').map do |l|
+		{
+		:list_name => l.at_css('h2').text,
+		:list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
+		}
+	end
+	offset = 0
+	added_value = 10
+	until doc.css('.invisible:contains("Next")').present? == true 
+		offset = offset + added_value
+		url = 'https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;limit=10;offset=' + offset.to_s
+		page = agent.get(url)
+		doc = page.parser
+		page_list = doc.css('.bookbag-controls-holder').map do |l|
+			{
+			:list_name => l.at_css('h2').text,
+			:list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
+			}
+		end
+		lists = lists + page_list
+	end
+
+	respond_to do |format|
+		format.json { render :json =>{:lists => lists}}
+	end	
 end
 
 
