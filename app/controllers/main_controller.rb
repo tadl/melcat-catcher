@@ -944,6 +944,7 @@ def get_user_with_token
 end
 
 def get_user_lists
+	headers['Access-Control-Allow-Origin'] = "*"
 	agent = set_token(params[:token])
 	page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists')
 	doc = page.parser
