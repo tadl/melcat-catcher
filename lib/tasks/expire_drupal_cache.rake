@@ -40,6 +40,8 @@ youth_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Youth/json"
 youth_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/27").read)
 youth_resources = JSON.parse(open("https://www.tadl.org/export/node/json/647").read)
 youth_award_winners = JSON.parse(open("https://www.tadl.org/export/node/json/644").read)
+youth_homework = JSON.parse(open("https://www.tadl.org/export/node/json/35978").read)
+youth_homeschool = JSON.parse(open("https://www.tadl.org/export/node/json/35979").read)
 teens_new = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19050&just_ids=yes").read)
 teens_manga = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19051&just_ids=yes").read)
 teens_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/28").read)
@@ -128,6 +130,8 @@ youth = {
 	:events_youth => youth_events,
 	:youth_resources => youth_resources,
 	:youth_award_winners => youth_award_winners,
+    :youth_homework => youth_homework,
+    :youth_homeschool => youth_homeschool,
 }
 
 teens = {
@@ -215,6 +219,8 @@ everything_else = { :time => timestamp,
 	:events_youth => youth_events,
 	:youth_resources => youth_resources,
 	:youth_award_winners => youth_award_winners,
+    :youth_homework => youth_homework,
+    :youth_homeschool => youth_homeschool,
 	:teens_new => teens_new,
 	:teens_manga => teens_manga,
 	:events_teens => teens_events,
