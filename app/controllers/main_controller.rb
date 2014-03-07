@@ -135,23 +135,26 @@ else
 @loc = "22"
 end
 
-if params[:sort].present?
- if params[:sort] == "RELEVANCE"
+
+ if params[:sort] == "relevance"
     @sorttype = "&sort="
-    @sortdefault ="RELEVANCE" 
-    elsif params[:sort] == "NEWEST TO OLDEST"
+ elsif params[:sort] == "newest_to_oldest"
     @sorttype = "&sort=pubdate.descending"
-    @sortdefault ="NEWEST TO OLDEST" 
-    elsif params[:sort] == "OLDEST TO NEWEST"
+ elsif params[:sort] == "oldest_to_newest"
     @sorttype = "&sort=pubdate"
-    @sortdefault ="OLDEST TO NEWEST" 
-    else
-    @sorttype = "&sort="
-    @sortdefault ="RELEVANCE" 
-    end
-else
-@sorttype=""
-end
+ elsif params[:sort] == "title_az"
+ 	@sorttype = "&sort=titlesort"
+ elsif params[:sort] == "title_za"
+ 	@sorttype = "&sort=titlesort.descending"
+ elsif params[:sort] == "author_az"
+ 	@sorttype = "&sort=authorsort"
+ elsif params[:sort] == "author_za"
+ 	@sorttype = "&sort=authorsort.descending"
+ else
+ 	@sorttype = ""
+ end
+
+
 
 if params[:mt].present?    
     if params[:mt] == "MOVIES"
