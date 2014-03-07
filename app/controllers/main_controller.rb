@@ -509,17 +509,9 @@ end
 
 def login
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-page.forms.class == Array
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
-accountpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/main")
-@doc = accountpage.parser
+agent = login_action(params[:u],params[:pw])
+page = agent.get("https://catalog.tadl.org")
+@doc = page.parser
 
 @user = @doc.css("body").map do |item| 
 {
@@ -534,6 +526,9 @@ user:
 }
 end
 
+agent = login_action(params[:u],params[:pw])
+test = agent.cookies.detect { |t| t.name == 'ses' }
+
 if @user.count == 0 || @user[0][:user][:name] == nil
 
 respond_to do |format|
@@ -542,7 +537,7 @@ end
 else
 
 respond_to do |format|
-format.json { render :json => { :users => @user }}
+format.json { render :json => { :users => @user, :token => test.value }}
 end
 end
 end
@@ -915,7 +910,7 @@ def get_token
 agent = login_action(params[:u],params[:pw])
 test = agent.cookies.detect { |t| t.name == 'ses' }
 	respond_to do |format|
-		format.json { render :json =>{:session_token => test }}
+		format.json { render :json =>{:session_token => test.value }}
 	end	
 end
 
