@@ -27,6 +27,7 @@ Ilscatcher::Application.routes.draw do
   get "main/get_user_lists"
   get "main/remove_from_list"
   get "main/marc"
+  get "main/passwordreset"
   get "drupal/test"
   get "drupal/drupal"
   get "drupal/library_reads"

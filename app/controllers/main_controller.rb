@@ -1056,6 +1056,29 @@ end
 
 end
 
+def passwordreset
+  headers['Access-Control-Allow-Origin'] = "*"
+  @user = params["user"]
 
+  agent = Mechanize.new
+  page = agent.get("https://catalog.tadl.org/eg/opac/password_reset")
+  form = page.forms[1]
+
+  if ( @user =~ /^TADL\d{7,8}$|^90\d{5}$|^91111\d{9}$|^[a-zA-Z]\d{10}/ )
+    form.field_with(:name => "barcode").value = @user
+  else
+    form.field_with(:name => "username").value = @user
+  end
+
+  results = agent.submit(form)
+
+  # TODO: check results and send appropriate status
+
+  @response = { status: 'UNKNOWN' }
+
+  respond_to do |format|
+    format.json { render json: @response }
+  end
+end
   
 end
