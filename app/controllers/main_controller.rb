@@ -233,7 +233,8 @@ item:
 :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
 :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
 :image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:abstract => item.at_css(".result_table_summary").text.strip.try(:squeeze, " "),
+:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
+:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
 :record_year => item.at_css(".record_year").try(:text),
 :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
 }
@@ -308,9 +309,10 @@ url = @pagetitle
 @record_details = @doc.css("#main-content").map do |detail|
 
 {
-:author => detail.at_css(".rdetail_authors_div").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
+:author => detail.at_css(".rdetail_authors_div").css('a').try(:to_s).try(:gsub, /\n/, "").try(:gsub,'<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').try(:gsub, 'itemprop="contributor"',')"').try( :gsub, 'subject"',"#{fix}"),
 :title => detail.at_css("#rdetail_title").text,
 :summary => detail.at_css("#rdetail_summary_from_rec").try(:text).try(:strip),
+:contents => detail.at_css("rdetail_contents_from_rec").try(:text).try(:strip),
 :record_id => @record_id,
 :copies_available => detail.at_css(".rdetail_aux_copycounts").try(:text).try(:strip).try(:gsub!, /available in District./," ").try(:squeeze, " ").try(:strip),
 :copies_total => detail.at_css(".rdetail_aux_holdcounts").try(:text).try(:strip).try(:split, "on ").try(:last).try(:gsub, /copies./," ").try(:gsub, /copy./," ").try(:strip),
@@ -322,6 +324,8 @@ url = @pagetitle
 :isbn => detail.search('span[@itemprop="isbn"]').to_s.try(:gsub, "<span class=\"rdetail_value\" itemprop=\"isbn\">", "").try(:gsub, "</span>", ", "),
 :physical_description => detail.at('td:contains("Physical Description")').try(:next_element).try(:text),
 :related_subjects => detail.at('td:contains("Subject:")').try(:next_element).try(:to_s).try(:strip).try(:gsub, /\n/, "").try(:gsub,'<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').try(:gsub, '"query=',"'").try( :gsub, 'subject"',"#{fix}"),
+:related_genres => detail.at('td:contains("Genre:")').try(:next_element).try(:to_s).try(:strip).try(:gsub, /\n/, "").try(:gsub,'<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').try(:gsub, '"query=',"'").try( :gsub, 'subject"',"#{fix}"),
+
 }
 
 end
@@ -893,8 +897,10 @@ def get_list
 			:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
 			:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
 			:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+			:list_item_id => item.at_css(".list-item-id").attr('title'),
 			:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-			:abstract => item.at_css(".result_table_summary").text.strip.try(:squeeze, " "),
+			:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
+			:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
 			:record_year => item.at_css(".record_year").try(:text),
 			:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
 			}
@@ -972,6 +978,24 @@ def get_user_lists
 
 	respond_to do |format|
 		format.json { render :json =>{:lists => lists}}
+	end	
+end
+
+def remove_from_list
+	headers['Access-Control-Allow-Origin'] = "*"
+	agent = set_token(params[:token])
+	agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;')
+	url = '/eg/opac/myopac/list/update?loc=22'
+	agent.post(url, { 
+		"bbid" => params[:list_id],
+		"loc" => '22',
+		"sort" => "",
+		"list" => params[:list_id],
+		"selected_item" => params[:list_item_id],
+		"action" => params[:action],
+	})
+	respond_to do |format|
+		format.json { render :json => 'done'}
 	end	
 end
 
