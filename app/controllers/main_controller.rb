@@ -249,8 +249,6 @@ end
 
 @itemlist = @doc.css(".result_table_row").map do |item| 
 {
-item:
-{
 :title => item.at_css(".bigger").text.strip, 
 :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
 :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
@@ -261,7 +259,6 @@ item:
 :contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
 :record_year => item.at_css(".record_year").try(:text),
 :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
-}
 }
 end 
 
