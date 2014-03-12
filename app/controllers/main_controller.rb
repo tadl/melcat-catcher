@@ -312,7 +312,7 @@ url = @pagetitle
 :author => detail.at_css(".rdetail_authors_div").css('a').try(:to_s).try(:gsub, /\n/, "").try(:gsub,'<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').try(:gsub, 'itemprop="contributor"',')"').try( :gsub, 'subject"',"#{fix}"),
 :title => detail.at_css("#rdetail_title").text,
 :summary => detail.at_css("#rdetail_summary_from_rec").try(:text).try(:strip),
-:contents => detail.at_css("rdetail_contents_from_rec").try(:text).try(:strip),
+:contents => detail.at_css("#rdetail_contents_from_rec").try(:text).try(:strip),
 :record_id => @record_id,
 :copies_available => detail.at_css(".rdetail_aux_copycounts").try(:text).try(:strip).try(:gsub!, /available in District./," ").try(:squeeze, " ").try(:strip),
 :copies_total => detail.at_css(".rdetail_aux_holdcounts").try(:text).try(:strip).try(:split, "on ").try(:last).try(:gsub, /copies./," ").try(:gsub, /copy./," ").try(:strip),
