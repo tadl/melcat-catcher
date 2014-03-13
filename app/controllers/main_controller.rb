@@ -330,7 +330,7 @@ url = @pagetitle
 @record_details = @doc.css("#main-content").map do |detail|
 
 {
-:author => detail.at_css(".rdetail_authors_div").css('a').try(:to_s).try(:gsub, /\n/, "").try(:gsub,'<a href="/eg/opac/results?locg=22;copy_offset=0;copy_limit=75;','<a onclick="subject_search("').try(:gsub, 'itemprop="contributor"',')"').try( :gsub, 'subject"',"#{fix}"),
+:author => detail.at_css(".rdetail_authors_div").try(:text).try(:gsub, /\n/, "").try(:strip),
 :title => detail.at_css("#rdetail_title").text,
 :summary => detail.at_css("#rdetail_summary_from_rec").try(:text).try(:strip),
 :contents => detail.at_css("#rdetail_contents_from_rec").try(:text).try(:strip),
@@ -366,11 +366,29 @@ shelf_location:
 end
 end
 @shelvinglocations_filtered = @shelvinglocations.compact.uniq
+
+@all_shelvinglocations = @doc.css('//table#rdetails_status//tr')[1..-1].map do |detail|
+if detail.at_css("td[2]").try(:text).try(:rstrip).present?
+{
+:library => detail.at_css("td[1]").try(:text).try(:rstrip),
+:shelving_location => detail.at_css("td[3]").try(:text).try(:squeeze, " "),
+:call_number => detail.at_css("td[2]").try(:text).try(:rstrip),
+:available => detail.at_css("td[4]").try(:text).try(:squeeze, " "),
+:due_date => detail.at_css("td[5]").try(:text).try(:squeeze, " "),
+}
+end
+end
+@all_shelvinglocations = @all_shelvinglocations.compact
 end
 
 
+
+
+
+
+
 respond_to do |format|
-format.json { render :json =>{:items => @record_details, :shelvinglocations => @shelvinglocations_filtered }}
+format.json { render :json =>{:items => @record_details, :shelvinglocations => @shelvinglocations_filtered, :all_copies => @all_shelvinglocations  }}
 end
 end
 
