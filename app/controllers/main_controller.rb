@@ -587,6 +587,7 @@ end
 
 
 def showcheckouts
+    headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
     url = 'https://catalog.tadl.org/eg/opac/myopac/circs?loc=22'
     page = agent.get(url)
