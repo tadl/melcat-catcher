@@ -1002,7 +1002,35 @@ def get_checkout_history
 
 end
 
+def get_hold_history
+    agent = set_token(params[:token])
+    if params[:page]
+        page = params[:page].to_i * 15
+    else
+        page = 0
+    end
+    url = 'https://catalog.tadl.org/eg/opac/myopac/hold_history?loc=22;limit=15;offset=' + page.to_s
+    page = agent.get(url)
+    doc = page.parser
+    hold_list = doc.css('#holds_main/table/tbody/tr').map do |c|
+        {
+            :title => c.css('td[1]/div/a[1]').text,
+            :record_id => c.at_css('td[1]/div/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
+            :author => c.css('td[2]/div/a[1]').text,
+        }
+    end
 
+    if doc.css('.invisible:contains("next")').present?
+        more = "false"
+    else
+        more = "true"
+    end
+
+    respond_to do |format|
+        format.json { render :json =>{:holds => hold_list, :more => more}}
+    end
+
+end
 
 
 def get_user_with_token
