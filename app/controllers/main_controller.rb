@@ -585,37 +585,31 @@ end
 end
 end
 
-def showcheckouts
-headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
-checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/circs?loc=22")
-@doc = checkoutpage.parser
-@pagetitle = @doc.css("title").text
-@checkouts = @doc.css('//table[1]/tr')[1..-1].map do |checkout|
-{
-checkout:
-{
-:checkout_id => checkout.at('td[1]/input')['value'],
-:name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
-:image => checkout.at_css("/td[2]/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:format_icon => checkout.css("/td[3]/img").attr("src").text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-}
-}
-end 
 
-respond_to do |format|
-format.json { render :json => Oj.dump(checkouts: @checkouts)}
-end
+def showcheckouts
+    agent = set_token(params[:token])
+    url = 'https://catalog.tadl.org/eg/opac/myopac/circs?loc=22'
+    page = agent.get(url)
+    @doc = page.parser
+    @pagetitle = @doc.css("title").text
+    @checkouts = @doc.css('//table[1]/tr')[1..-1].map do |checkout|
+    {
+        checkout:
+        {
+            :checkout_id => checkout.at('td[1]/input')['value'],
+            :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
+            :image => checkout.at_css("/td[2]/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+            :renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            :due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            :format_icon => checkout.css("/td[3]/img").attr("src").text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
+            :barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+        }
+    }
+    end 
+
+    respond_to do |format|
+        format.json { render :json => Oj.dump(checkouts: @checkouts)}
+    end
 end
 
 def showholds
