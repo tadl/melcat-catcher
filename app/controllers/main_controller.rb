@@ -965,6 +965,7 @@ def set_token(token)
 end
 
 def get_checkout_history
+	headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
     if params[:page]
         page = params[:page].to_i * 15
@@ -998,6 +999,7 @@ def get_checkout_history
 end
 
 def get_hold_history
+	headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
     if params[:page]
         page = params[:page].to_i * 15
