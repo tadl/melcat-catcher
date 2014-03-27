@@ -964,6 +964,39 @@ def set_token(token)
 	return agent
 end
 
+def get_payment_history
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    if params[:page]
+        page = params[:page].to_i * 20
+    else
+        page = 0
+    end
+    url = 'https://catalog.tadl.org/eg/opac/myopac/main_payments?limit=20;offset=' + page.to_s
+    page = agent.get(url)
+    doc = page.parser
+    payments_list = doc.css('table.myopac_payments_table/tbody/tr').map do |c|
+        {
+            :pmt_date => c.css('td[1]').text,
+            :pmt_for => c.css('td[2]').text,
+            :pmt_amt => c.css('td[3]').text,
+        }
+    end
+    
+    if doc.css('.invisible:contains("Next")').present?
+        more = "false"
+    else
+        more = "true"
+    end
+
+    respond_to do |format|
+        format.json { render :json =>{:payments => payments_list, :more => more}}
+    end
+
+
+end
+
+
 def get_checkout_history
 	headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
