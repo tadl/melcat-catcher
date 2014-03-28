@@ -27,6 +27,8 @@ Ilscatcher::Application.routes.draw do
   get "main/get_user_lists"
   get "main/remove_from_list"
   get "main/marc"
+  get "main/receipt_print"
+  get "main/receipt_email"
   get "main/passwordreset"
   get "main/get_checkout_history"
   get "main/get_hold_history"
