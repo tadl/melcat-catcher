@@ -1001,6 +1001,40 @@ def receipt_email
     end
 end
 
+def get_fines
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    if params[:page]
+        page = params[:page].to_i * 20
+    else
+        page = 0
+    end
+# this needs testing with more accounts (specifically ones that have a LOT of bills)
+    url = 'https://catalog.tadl.org/eg/opac/myopac/main?limit=20;offset=' + page.to_s
+    page = agent.get(url)
+    doc = page.parser
+    fines_list = doc.css('#myopac_trans_div/table/tbody/tr').map do |c|
+        {
+            :transaction_start_date => c.css('td[1]').text.try(:strip),
+            :last_pmt_date => c.css('td[2]').text.try(:strip),
+            :initial_amt_owed => c.css('td[3]').text.try(:strip),
+            :total_amt_paid => c.css('td[4]').text.try(:strip),
+            :balance_owed => c.css('td[5]').text.try(:strip),
+            :billing_type => c.css('td[6]').text.try(:strip),
+        }
+    end
+
+    #if doc.css('.invisible:contains("Next")').present?
+        more = "false"
+    #else
+    #    more = "true"
+    #end
+
+    respond_to do |format|
+        format.json { render :json =>{:fines => fines_list, :more => more}}
+    end
+end
+
 def get_payment_history
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])

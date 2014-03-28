@@ -33,6 +33,7 @@ Ilscatcher::Application.routes.draw do
   get "main/get_checkout_history"
   get "main/get_hold_history"
   get "main/get_payment_history"
+  get "main/get_fines"
   get "drupal/test"
   get "drupal/drupal"
   get "drupal/library_reads"
