@@ -979,6 +979,7 @@ def get_payment_history
         {
             :pmt_date => c.css('td[1]').text,
             :pmt_for => c.css('td[2]').text,
+            :pmt_id => c.at_css('td[4]/form/input[1]').attr('value'),
             :pmt_amt => c.css('td[3]').text,
         }
     end
