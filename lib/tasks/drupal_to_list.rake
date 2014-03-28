@@ -18,7 +18,7 @@ urls_and_list_ids = [{"name" => "New Music", "url" => "https://www.tadl.org/mobi
 	{"name" => "Featured Fiction", "url" => "https://www.tadl.org/mobile/export/items/67/json", "list_id" => "19039"},
 	{"name" => "Featured Non-Fiction", "url" => "https://www.tadl.org/mobile/export/items/68/json", "list_id" => "19040"},
 	{"name" => "Adult Display", "url" => "https://www.tadl.org/mobile/export/items/45/json/all/json", "list_id" => "19041"},
-	{"name" => "Club Kits", "url" => "https://www.tadl.org/mobile/export/items/224/json", "list_id" => "19042"},
+	{"name" => "Club Kits", "url" => "https://www.tadl.org/mobile/export/items/224/all/json", "list_id" => "19042"},
 	{"name" => "Business Books", "url" => "https://www.tadl.org/mobile/export/items/234/json", "list_id" => "19043"},
 	{"name" => "New Videos", "url" => "https://www.tadl.org/mobile/export/items/32/json", "list_id" => "19044"},
 	{"name" => "Hot Videos", "url" => "https://www.tadl.org/mobile/export/items/34/json", "list_id" => "19045"},
