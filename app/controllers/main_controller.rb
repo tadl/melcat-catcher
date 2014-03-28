@@ -964,6 +964,43 @@ def set_token(token)
 	return agent
 end
 
+# DEVEL
+# @marc = @doc.at_css('.marc_table').to_s.gsub(/\n/,'').gsub(/\t/,'')
+
+def receipt_print
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    action = params[:action]
+    url = 'https://catalog.tadl.org/eg/opac/myopac/receipt_print'
+    page = agent.post(url, {
+        "payment" => params[:pmt_id],
+    })
+    doc = page.parser
+    response = doc.at_css('#printable-receipt').to_s.gsub(/\n/,'')
+    respond_to do |format|
+        format.json { render :json =>{:message => response}}
+    end
+end
+
+def receipt_email
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    action = params[:action]
+    url = 'https://catalog.tadl.org/eg/opac/myopac/receipt_email'
+    page = agent.post(url, {
+        "payment" => params[:pmt_id],
+    })
+    doc = page.parser
+    response = doc.css('#main-content').map do |c|
+        {
+            :message => c.css('div').text.try(:strip),
+        }
+    end
+    respond_to do |format|
+        format.json { render :json =>{:message => response}}
+    end
+end
+
 def get_payment_history
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
@@ -993,8 +1030,6 @@ def get_payment_history
     respond_to do |format|
         format.json { render :json =>{:payments => payments_list, :more => more}}
     end
-
-
 end
 
 
