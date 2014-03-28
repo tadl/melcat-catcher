@@ -77,7 +77,7 @@ news_wood = JSON.parse(open("https://www.tadl.org/export/news/location/json/25")
 
 home = {
 	:featured_news => featured_news,
-	:events => events,
+	:events => events['nodes'].first(5),
 	:books_featured_fiction => books_featured_fiction, 
 	:books_featured_nonfiction => books_featured_nonfiction,
 	:videos_new => videos_new,
@@ -127,7 +127,7 @@ youth = {
 	:youth_display => youth_display, 
 	:youth_new_books => youth_new_books,
 	:youth_reviews => youth_reviews,
-	:events_youth => youth_events,
+	:events_youth => youth_events['nodes'].first(5),
 	:youth_resources => youth_resources,
 	:youth_award_winners => youth_award_winners,
     :youth_homework => youth_homework,
@@ -137,7 +137,7 @@ youth = {
 teens = {
 	:teens_new => teens_new,
 	:teens_manga => teens_manga,
-	:events_teens => teens_events,
+	:events_teens => teens_events['nodes'].first(5),
 	:teens_reviews => teens_reviews,
 	:teens_homework => teens_homework,
 	:teens_lists => teens_lists,
@@ -175,12 +175,12 @@ locations = {
 	:infobox_ipl => infobox_ipl,
 	:infobox_flpl => infobox_flpl,
 	:infobox_wood => infobox_wood,
-	:events_pcl => events_pcl,
-	:events_ebb => events_ebb,
-	:events_kbl => events_kbl,
-	:events_ipl => events_ipl,
-	:events_flpl => events_flpl,
-	:events_wood => events_wood,
+	:events_pcl => events_pcl['nodes'].first(5),
+	:events_ebb => events_ebb['nodes'].first(5),
+	:events_kbl => events_kbl['nodes'].first(5),
+	:events_ipl => events_ipl['nodes'].first(5),
+	:events_flpl => events_flpl['nodes'].first(5),
+	:events_wood => events_wood['nodes'].first(5),
 	:news_pcl => news_pcl,
 	:news_ebb => news_ebb,
 	:news_kbl => news_kbl,
@@ -191,7 +191,7 @@ locations = {
 
 
 everything_else = { :time => timestamp,
-	:events_adults => adult_events,
+	:events_adults => adult_events['nodes'].first(5),
 	:books_featured_fiction => books_featured_fiction, 
 	:books_featured_nonfiction => books_featured_nonfiction, 
 	:books_adult_display => books_adult_display,
@@ -216,19 +216,19 @@ everything_else = { :time => timestamp,
 	:youth_display => youth_display, 
 	:youth_new_books => youth_new_books,
 	:youth_reviews => youth_reviews,
-	:events_youth => youth_events,
+	:events_youth => youth_events['nodes'].first(5),
 	:youth_resources => youth_resources,
 	:youth_award_winners => youth_award_winners,
     :youth_homework => youth_homework,
     :youth_homeschool => youth_homeschool,
 	:teens_new => teens_new,
 	:teens_manga => teens_manga,
-	:events_teens => teens_events,
+	:events_teens => teens_events['nodes'].first(5),
 	:teens_reviews => teens_reviews,
 	:teens_homework => teens_homework,
 	:teens_lists => teens_lists,	
 	:featured_news => featured_news,
-	:events => events,
+	:events => events['nodes'].first(5),
 	:hours_ebb => hours_ebb,
 	:hours_pcl => hours_pcl,
 	:hours_kbl => hours_kbl,
@@ -241,12 +241,12 @@ everything_else = { :time => timestamp,
 	:infobox_ipl => infobox_ipl,
 	:infobox_flpl => infobox_flpl,
 	:infobox_wood => infobox_wood,
-	:events_pcl => events_pcl,
-	:events_ebb => events_ebb,
-	:events_kbl => events_kbl,
-	:events_ipl => events_ipl,
-	:events_flpl => events_flpl,
-	:events_wood => events_wood,
+	:events_pcl => events_pcl['nodes'].first(5),
+	:events_ebb => events_ebb['nodes'].first(5),
+	:events_kbl => events_kbl['nodes'].first(5),
+	:events_ipl => events_ipl['nodes'].first(5),
+	:events_flpl => events_flpl['nodes'].first(5),
+	:events_wood => events_wood['nodes'].first(5),
 	:news_pcl => news_pcl,
 	:news_ebb => news_ebb,
 	:news_kbl => news_kbl,
@@ -254,6 +254,19 @@ everything_else = { :time => timestamp,
 	:news_flpl => news_flpl,
 	:news_wood => news_wood,
 	}
+
+all_events = {
+	:events => events['nodes'],
+	:events_adults => adult_events['nodes'],
+	:events_pcl => events_pcl['nodes'],
+	:events_ebb => events_ebb['nodes'],
+	:events_kbl => events_kbl['nodes'],
+	:events_ipl => events_ipl['nodes'],
+	:events_flpl => events_flpl['nodes'],
+	:events_wood => events_wood['nodes'],
+	:events_youth => youth_events['nodes'],
+	:events_teens => teens_events['nodes'],
+}	
 
 
 Rails.cache.write("everything_else", everything_else)
@@ -266,6 +279,7 @@ Rails.cache.write("teens", teens)
 Rails.cache.write("online", online)
 Rails.cache.write("lists", lists)
 Rails.cache.write("locations", locations)
+Rails.cache.write("events", all_events)
 
 
 end
