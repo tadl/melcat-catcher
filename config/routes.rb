@@ -29,6 +29,8 @@ Ilscatcher::Application.routes.draw do
   get "main/marc"
   get "main/passwordreset"
   get "main/get_checkout_history"
+  get "main/get_hold_history"
+  get "main/get_payment_history"
   get "drupal/test"
   get "drupal/drupal"
   get "drupal/library_reads"

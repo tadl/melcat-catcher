@@ -585,37 +585,32 @@ end
 end
 end
 
-def showcheckouts
-headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
-checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/circs?loc=22")
-@doc = checkoutpage.parser
-@pagetitle = @doc.css("title").text
-@checkouts = @doc.css('//table[1]/tr')[1..-1].map do |checkout|
-{
-checkout:
-{
-:checkout_id => checkout.at('td[1]/input')['value'],
-:name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
-:image => checkout.at_css("/td[2]/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:format_icon => checkout.css("/td[3]/img").attr("src").text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-}
-}
-end 
 
-respond_to do |format|
-format.json { render :json => Oj.dump(checkouts: @checkouts)}
-end
+def showcheckouts
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    url = 'https://catalog.tadl.org/eg/opac/myopac/circs?loc=22'
+    page = agent.get(url)
+    @doc = page.parser
+    @pagetitle = @doc.css("title").text
+    @checkouts = @doc.css('//table[1]/tr')[1..-1].map do |checkout|
+    {
+        checkout:
+        {
+            :checkout_id => checkout.at('td[1]/input')['value'],
+            :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
+            :image => checkout.at_css("/td[2]/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+            :renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            :due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            :format_icon => checkout.css("/td[3]/img").attr("src").text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
+            :barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+        }
+    }
+    end 
+
+    respond_to do |format|
+        format.json { render :json => Oj.dump(checkouts: @checkouts)}
+    end
 end
 
 def showholds
@@ -969,7 +964,41 @@ def set_token(token)
 	return agent
 end
 
+def get_payment_history
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    if params[:page]
+        page = params[:page].to_i * 20
+    else
+        page = 0
+    end
+    url = 'https://catalog.tadl.org/eg/opac/myopac/main_payments?limit=20;offset=' + page.to_s
+    page = agent.get(url)
+    doc = page.parser
+    payments_list = doc.css('table.myopac_payments_table/tbody/tr').map do |c|
+        {
+            :pmt_date => c.css('td[1]').text,
+            :pmt_for => c.css('td[2]').text,
+            :pmt_amt => c.css('td[3]').text,
+        }
+    end
+    
+    if doc.css('.invisible:contains("Next")').present?
+        more = "false"
+    else
+        more = "true"
+    end
+
+    respond_to do |format|
+        format.json { render :json =>{:payments => payments_list, :more => more}}
+    end
+
+
+end
+
+
 def get_checkout_history
+	headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
     if params[:page]
         page = params[:page].to_i * 15
@@ -1002,7 +1031,36 @@ def get_checkout_history
 
 end
 
+def get_hold_history
+	headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    if params[:page]
+        page = params[:page].to_i * 15
+    else
+        page = 0
+    end
+    url = 'https://catalog.tadl.org/eg/opac/myopac/hold_history?loc=22;limit=15;offset=' + page.to_s
+    page = agent.get(url)
+    doc = page.parser
+    hold_list = doc.css('#holds_main/table/tbody/tr').map do |c|
+        {
+            :title => c.css('td[1]/div/a[1]').text,
+            :record_id => c.at_css('td[1]/div/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
+            :author => c.css('td[2]/div/a[1]').text,
+        }
+    end
 
+    if doc.css('.invisible:contains("next")').present?
+        more = "false"
+    else
+        more = "true"
+    end
+
+    respond_to do |format|
+        format.json { render :json =>{:holds => hold_list, :more => more}}
+    end
+
+end
 
 
 def get_user_with_token
