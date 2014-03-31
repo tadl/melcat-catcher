@@ -985,7 +985,6 @@ end
 def receipt_email
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
-    action = params[:action]
     url = 'https://catalog.tadl.org/eg/opac/myopac/receipt_email'
     page = agent.post(url, {
         "payment" => params[:pmt_id],
