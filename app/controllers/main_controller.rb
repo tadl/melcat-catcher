@@ -970,7 +970,6 @@ end
 def receipt_print
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
-    action = params[:action]
     url = 'https://catalog.tadl.org/eg/opac/myopac/receipt_print'
     page = agent.post(url, {
         "payment" => params[:pmt_id],
