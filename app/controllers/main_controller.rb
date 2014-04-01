@@ -454,18 +454,10 @@ end
 
 def multihold
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
 @record_id = params[:record_id]
 @split_ids = @record_id.split(",").map(&:strip).reject(&:empty?)
 @split_formated = @split_ids.map! { |k| "&hold_target=#{k}" }.join
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-page.forms.class == Array
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
+agent = set_token(params[:token])
 holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?hold_type=T&loc=22'+@split_formated)
 holdform = agent.page.forms[1]  
 holdconfirm = agent.submit(holdform)
