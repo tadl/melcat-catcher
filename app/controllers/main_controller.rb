@@ -440,16 +440,8 @@ end
 
 def hold
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
 @record_id = params[:record_id]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-page.forms.class == Array
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
+agent = set_token(params[:token])
 holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?;locg=22;hold_target='+ @record_id +';hold_type=T;')
 holdform = agent.page.forms[1]  
 holdconfirm = agent.submit(holdform)
