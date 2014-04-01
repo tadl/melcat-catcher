@@ -489,17 +489,9 @@ end
 
 def renew
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
 @circ_id = params[:circ_id]
 @barcode = params[:bc]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-page.forms.class == Array
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
+agent = set_token(params[:token])
 renew = agent.get('https://catalog.tadl.org/eg/opac/myopac/circs?&action=renew&circ='+ @circ_id +'')
 @doc = renew.parser
 @renew_summary = @doc.css(".renew-summary").text
