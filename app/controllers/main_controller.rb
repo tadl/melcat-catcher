@@ -599,15 +599,8 @@ end
 
 def showholds
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
-checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?loc=22")
+agent = set_token(params[:token])
+checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds")
 @doc = checkoutpage.parser
 @pagetitle = @doc.css("title").text
 @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
