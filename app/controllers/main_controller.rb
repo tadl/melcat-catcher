@@ -627,14 +627,7 @@ end
 def showpickups
 
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
+agent = set_token(params[:token])
 checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?available=1")
 @doc = checkoutpage.parser
 @pagetitle = @doc.css("title").text
@@ -661,14 +654,7 @@ end
 
 def showcard
 headers['Access-Control-Allow-Origin'] = "*"
-@username = params[:u]
-@password = params[:pw]
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = @username
-form.field_with(:name => "password").value = @password
-results = agent.submit(form)
+agent = set_token(params[:token])
 accountdetails = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs?loc=22")
 @doc = accountdetails.parser
 @barcode = @doc.css('.active_barcode').text
