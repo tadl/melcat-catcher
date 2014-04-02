@@ -10,6 +10,7 @@ Ilscatcher::Application.routes.draw do
   get "main/showcheckouts"
   get "main/showholds"
   get "main/cancelhold"
+  get "main/holdaction"
   get "main/showpickups"
   get "main/itemonshelf"
   get "main/showcard"
