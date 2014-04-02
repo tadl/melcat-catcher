@@ -521,16 +521,16 @@ end
 #this can probably replace cancelhold, ultimately
 def holdaction
     headers['Access-Control-Allow-Origin'] = "*"
-    hold_id = params[:hold_id]
     agent = set_token(params[:token])
-    action = params[:action]
-    dostuff = agent.get('https://catalog.tadl.org/eg/opac/myopac/holds?action=' + action + '&hold_id=' + hold_id)
+    dostuff = agent.post('https://catalog.tadl.org/eg/opac/myopac/holds', {
+        "action" => params[:todo],
+        "hold_id" => params[:hold_id],
+    })
 
     respond_to do |format|
         format.json { render :json => Oj.dump("Hello")}
     end
 end
-
 
 
 def login
