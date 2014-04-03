@@ -19,7 +19,7 @@ books_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Books/json"
 books_adult_display = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19041&just_ids=yes").read)
 books_adult_clubkits = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19042&just_ids=yes").read)
 books_adult_business = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19043&just_ids=yes").read)
-library_reads = JSON.parse(open("http://mel-catcher.herokuapp.com/main/library_reads.json").read)
+library_reads = JSON.parse(open("http://mel-catcher.herokuapp.com/drupal/library_reads.json").read)
 books_book_list = JSON.parse(open("https://www.tadl.org/export/node/json/80").read)
 music_new = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19036&just_ids=yes").read)
 music_hot = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19038&just_ids=yes").read)

@@ -11,7 +11,7 @@ require 'memcachier'
 require 'timeout'
 require 'json'
 
-before_filter :set_cache_headers, :only => [:drupal] 
+before_filter :set_cache_headers, :only => [:drupal, :library_reads] 
 caches_action :drupal, :cache_path => Proc.new { |c| c.params }, :expires_in => 9.minutes, :race_condition_ttl => 1.minutes
 
 
