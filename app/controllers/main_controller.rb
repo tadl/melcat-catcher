@@ -1117,10 +1117,11 @@ def get_user_lists
 	page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists')
 	doc = page.parser
 	lists = doc.css('.bookbag-controls-holder').map do |l|
-		{
+    {
 		:list_name => l.at_css('h2').text,
 		:list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
-		}
+        :list_desc => l.css('.bookbag-description').text,
+    }
 	end
 	offset = 0
 	added_value = 10
@@ -1130,10 +1131,11 @@ def get_user_lists
 		page = agent.get(url)
 		doc = page.parser
 		page_list = doc.css('.bookbag-controls-holder').map do |l|
-			{
+        {
 			:list_name => l.at_css('h2').text,
 			:list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
-			}
+            :list_desc => l.css('.bookbag-description').text,
+        }
 		end
 		lists = lists + page_list
 	end
