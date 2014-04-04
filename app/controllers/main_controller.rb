@@ -624,31 +624,30 @@ end
 
 
 def showpickups
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?available=1")
+    @doc = checkoutpage.parser
+    @pagetitle = @doc.css("title").text
+    @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
+    {
+        hold:
+        {
+            :hold_id => checkout.at('td[1]/div/input')['value'],
+            :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
+            :author => checkout.css("/td[3]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            :format_icon => checkout.css("/td[4]/div/img").attr('src').text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
+            :image => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+            :pickup_location => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            :active => checkout.css("/td[8]").text.to_s.squeeze().strip().squeeze().starts_with?('A'),
+            :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
+        }
+    }
+    end 
 
-headers['Access-Control-Allow-Origin'] = "*"
-agent = set_token(params[:token])
-checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?available=1")
-@doc = checkoutpage.parser
-@pagetitle = @doc.css("title").text
-@holds = @doc.css('tr#acct_holds_temp').map do |checkout|
-{
-hold:
-{
-:hold_id => checkout.at('td[1]/div/input')['value'],
-:name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
-:author => checkout.css("/td[3]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:format_icon => checkout.css("/td[4]/div/img").attr('src').text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:image => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-:pickup_location => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
-}
-}
-end 
-
-respond_to do |format|
-
-format.json { render :json => Oj.dump(holds: @holds)}
-end
+    respond_to do |format|
+        format.json { render :json => Oj.dump(holds: @holds)}
+    end
 end
 
 def showcard
