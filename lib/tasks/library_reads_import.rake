@@ -10,131 +10,51 @@ require 'dalli'
 require 'memcachier'
 require 'timeout'
 
+def new_agent(url)
+    agent = Mechanize.new
+    page = agent.get(url)
+    html = page.parser
+    return html
+end  
 
-timestamp = Time.now.to_s
-books_featured_fiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/67/json").read)
-books_featured_nonfiction = JSON.parse(open("https://www.tadl.org/mobile/export/items/68/json").read)
-books_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Books/json").read)
-books_adult_display = JSON.parse(open("https://www.tadl.org/mobile/export/items/45/all/json").read)
-books_adult_clubkits = JSON.parse(open("https://www.tadl.org/mobile/export/items/224/all/json").read)
-books_adult_business = JSON.parse(open("https://www.tadl.org/mobile/export/items/234/all/json").read)
-books_book_list = JSON.parse(open("https://www.tadl.org/export/node/json/80").read)
-music_new = JSON.parse(open("https://www.tadl.org/mobile/export/items/29/json").read)
-music_hot = JSON.parse(open("https://www.tadl.org/mobile/export/items/31/json").read)
-music_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Music/json").read)
-music_links = JSON.parse(open("https://www.tadl.org/export/node/json/113").read)
-videos_new = JSON.parse(open("https://www.tadl.org/mobile/export/items/32/json").read)
-videos_hot = JSON.parse(open("https://www.tadl.org/mobile/export/items/34/json").read)
-videos_tcff = JSON.parse(open("https://www.tadl.org/mobile/export/items/165/all/json").read)
-videos_met = JSON.parse(open("https://www.tadl.org/mobile/export/items/286/all/json").read)
-video_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Video/json").read)
-online_mel = JSON.parse(open("https://www.tadl.org/export/node/json/3373").read)
-online_resources = JSON.parse(open("https://www.tadl.org/export/node/json/3372").read)
-online_legal = JSON.parse(open("https://www.tadl.org/export/node/json/25242").read)
-online_ebooks = JSON.parse(open("https://www.tadl.org/export/node/json/14040").read)
-youth_display = JSON.parse(open("https://www.tadl.org/mobile/export/items/47/all/json").read) 
-youth_new_books = JSON.parse(open("https://www.tadl.org/mobile/export/items/52/json").read)
-youth_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Youth/json").read)
-youth_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/27").read)
-youth_resources = JSON.parse(open("https://www.tadl.org/export/node/json/647").read)
-youth_award_winners = JSON.parse(open("https://www.tadl.org/export/node/json/644").read)
-teens_new = JSON.parse(open("https://www.tadl.org/mobile/export/items/51/json").read)
-teens_manga = JSON.parse(open("https://www.tadl.org/mobile/export/items/41/json").read)
-teens_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/28").read)
-teens_reviews = JSON.parse(open("https://www.tadl.org/export/reviews/Teens/json").read)
-teens_homework = JSON.parse(open("https://www.tadl.org/export/node/json/409").read)
-teens_lists = JSON.parse(open("https://www.tadl.org/export/node/json/12784").read)
-hours_pcl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/plc").read)
-hours_ebb = JSON.parse(open("https://www.tadl.org/mobile/export/locations/ebb").read)
-hours_kbl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/kbl").read)
-hours_ipl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/ipl").read)
-hours_flpl = JSON.parse(open("https://www.tadl.org/mobile/export/locations/flpl").read)
-hours_wood = JSON.parse(open("https://www.tadl.org/mobile/export/locations/wood").read)
-infobox_pcl = JSON.parse(open("https://www.tadl.org/export/node/json/583").read)
-infobox_ebb = JSON.parse(open("https://www.tadl.org/export/node/json/5439").read)
-infobox_kbl = JSON.parse(open("https://www.tadl.org/export/node/json/23123").read)
-infobox_ipl = JSON.parse(open("https://www.tadl.org/export/node/json/580").read)
-infobox_flpl = JSON.parse(open("https://www.tadl.org/export/node/json/578").read)
-infobox_wood = JSON.parse(open("https://www.tadl.org/export/node/json/5439").read)
-featured_news = JSON.parse(open("https://www.tadl.org/export/news/json").read)
-events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/all").read)
-events_pcl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/24").read)
-events_ebb = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/19").read)
-events_kbl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/22").read)
-events_ipl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/21").read)
-events_flpl = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/20").read)
-events_wood = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/25").read)
-news_pcl = JSON.parse(open("https://www.tadl.org/export/news/location/json/24").read) 
-news_ebb = JSON.parse(open("https://www.tadl.org/export/news/location/json/19").read) 
-news_kbl = JSON.parse(open("https://www.tadl.org/export/news/location/json/22").read) 
-news_ipl = JSON.parse(open("https://www.tadl.org/export/news/location/json/21").read) 
-news_flpl = JSON.parse(open("https://www.tadl.org/export/news/location/json/20").read) 
-news_wood = JSON.parse(open("https://www.tadl.org/export/news/location/json/25").read) 
+feed_url = 'http://libraryreads.org/'
+		html = new_agent(feed_url)
+		items = html.css('p:contains("ISBN")').map do |item|
+			{
+				:title => item.previous.previous.previous.previous.try(:text),
+ 				:author => item.previous.previous.try(:text),
+ 				:isbn => item.try(:text).split("ISBN:")[1].try(:strip),
+ 				:review => item.next.next.try(:text),
+ 				:review_author => item.next.next.next.next.try(:text),
+			}
+		end
+		items.reverse_each do |item|
+			puts item[:isbn]
+			item_url = 'http://catalog.tadl.org/eg/opac/results?query=' + item[:isbn]
+			html = new_agent(item_url)
+			if html.search('p:contains("Keyword Search Tips")').present?
+				items.delete(item)
+			else
+				holdings = html.css(".result_table_row").map do |item| 
+      		{
+        		:title => item.at_css(".bigger").text.strip, 
+        		:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
+        		:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+        		:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
+        		:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+        		:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+        		:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
+        		:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
+        		:record_year => item.at_css(".record_year").try(:text),
+        		:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+      		}
+    		end	
+    		item.merge! :holdings => holdings
+			end
+		end
+	
 
-
-bingo = { :time => timestamp, 
-	:books_featured_fiction => books_featured_fiction, 
-	:books_featured_nonfiction => books_featured_nonfiction, 
-	:books_adult_display => books_adult_display,
-	:books_adult_clubkits => books_adult_clubkits,
-	:books_adult_business => books_adult_business,
-	:books_reviews => books_reviews,
-	:books_book_list => books_book_list,  
-	:music_new => music_new, 
-	:music_hot => music_hot,
-	:music_reviews => music_reviews,
-	:music_links => music_links,
-	:videos_new => videos_new,
-	:videos_hot => videos_hot,
-	:videos_tcff => videos_tcff,
-	:videos_met => videos_met,
-	:videos_reviews => video_reviews,
-	:online_mel => online_mel,
-	:online_resources => online_resources,
-	:online_legal => online_legal,
-	:online_ebooks => online_ebooks,
-	:youth_display => youth_display, 
-	:youth_new_books => youth_new_books,
-	:youth_reviews => youth_reviews,
-	:youth_events => youth_events,
-	:youth_resources => youth_resources,
-	:youth_award_winners => youth_award_winners,
-	:teens_new => teens_new,
-	:teens_manga => teens_manga,
-	:teens_events => teens_events,
-	:teens_reviews => teens_reviews,
-	:teens_homework => teens_homework,
-	:teens_lists => teens_lists,	
-	:featured_news => featured_news,
-	:events => events,
-	:hours_pcl => hours_pcl,
-	:hours_ebb => hours_ebb,
-	:hours_kbl => hours_kbl,
-	:hours_ipl => hours_ipl,
-	:hours_flpl => hours_flpl,
-	:hours_wood => hours_wood,
-	:infobox_pcl => infobox_pcl,
-	:infobox_ebb => infobox_ebb,
-	:infobox_kbl => infobox_kbl,
-	:infobox_ipl => infobox_ipl,
-	:infobox_flpl => infobox_flpl,
-	:infobox_wood => infobox_wood,
-	:events_pcl => events_pcl,
-	:events_ebb => events_ebb,
-	:events_kbl => events_kbl,
-	:events_ipl => events_ipl,
-	:events_flpl => events_flpl,
-	:events_wood => events_wood,
-	:news_pcl => news_pcl,
-	:news_ebb => news_ebb,
-	:news_kbl => news_kbl,
-	:news_ipl => news_ipl,
-	:news_flpl => news_flpl,
-	:news_wood => news_wood,
-	}
-
-
-Rails.cache.write("test", bingo)
+Rails.cache.write("library_reads", items)
 
 
 
