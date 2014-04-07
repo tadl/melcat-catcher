@@ -1,4 +1,6 @@
 Ilscatcher::Application.routes.draw do
+  get "feedback/staff"
+
   get "main/index"
   get "main/searchjson"
   get "main/itemdetails"
