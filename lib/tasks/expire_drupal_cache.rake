@@ -12,6 +12,7 @@ require 'timeout'
 
 
 timestamp = Time.now.to_s
+announcements = JSON.parse(open("https://www.tadl.org/export/announcements/json").read)
 adult_events = JSON.parse(open("https://www.tadl.org/mobile/export/events/formatted/json/26").read)
 books_featured_fiction = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19039&just_ids=yes").read)
 books_featured_nonfiction = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19040&just_ids=yes").read)
@@ -283,6 +284,7 @@ Rails.cache.write("online", online)
 Rails.cache.write("lists", lists)
 Rails.cache.write("locations", locations)
 Rails.cache.write("events", all_events)
+Rails.cache.write("announcements", announcements)
 
 
 end
