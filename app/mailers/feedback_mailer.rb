@@ -10,7 +10,7 @@ class FeedbackMailer < ActionMailer::Base
     t = Time.now
     @day_month_year = t.strftime("%m/%d/%Y")
     @hour_minute = t.strftime("%I:%M%p")
-    mail(to: 'smorey@tadl.org', subject: 'Feedback from ' + @name)
+    mail(to: 'smorey@tadl.org, wjr@tadl.org, jgodin@tadl.org', subject: 'Feedback from ' + @name)
   end
 
 
