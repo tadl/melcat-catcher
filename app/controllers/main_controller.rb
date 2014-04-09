@@ -868,7 +868,7 @@ def get_list
 	list_id = params[:list_id].to_s
 	page_number = page.to_s
 	
-	url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=24' + available +'&page='+ page_number +'&locg=22'
+	url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=20' + available +'&page='+ page_number +'&locg=22'
 	
 	agent = Mechanize.new
 	page = agent.get(url)
