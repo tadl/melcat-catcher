@@ -890,7 +890,7 @@ def get_list
         {
         :title => item.at_css(".bigger").text.strip, 
         :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-        :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+        :availability => '', 
         :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
         :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
         :list_item_id => item.at_css(".list-item-id").attr('title'),
