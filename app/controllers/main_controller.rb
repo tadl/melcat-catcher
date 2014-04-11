@@ -885,21 +885,39 @@ def get_list
 			}
 		end 
 	else
-		itemlist = doc.css(".result_table_row").map do |item| 
-			{
-			:title => item.at_css(".bigger").text.strip, 
-			:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-			:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
-			:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
-			:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
-			:list_item_id => item.at_css(".list-item-id").attr('title'),
-			:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-			:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
-			:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
-			:record_year => item.at_css(".record_year").try(:text),
-			:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
-			}
-		end 
+		if params[:featured] == 'yes'
+      itemlist = doc.css(".result_table_row").take(20).map do |item| 
+        {
+        :title => item.at_css(".bigger").text.strip, 
+        :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
+        :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+        :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
+        :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+        :list_item_id => item.at_css(".list-item-id").attr('title'),
+        :image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+        :abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
+        :contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
+        :record_year => item.at_css(".record_year").try(:text),
+        :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
+        }
+      end
+    else
+      itemlist = doc.css(".result_table_row").map do |item| 
+		  	{
+		  	:title => item.at_css(".bigger").text.strip, 
+		  	:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
+		  	:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+		  	:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
+		  	:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+		  	:list_item_id => item.at_css(".list-item-id").attr('title'),
+		  	:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+		  	:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
+		  	:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
+		  	:record_year => item.at_css(".record_year").try(:text),
+		  	:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
+		  	}
+		  end
+    end 
 	end
 	respond_to do |format|
 		format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist}}
