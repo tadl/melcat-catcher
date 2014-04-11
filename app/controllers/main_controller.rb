@@ -925,17 +925,18 @@ def get_list
 end
 
 def by_id
-    record_ids = params[:ids].split(',')
-    ids = ''
-    ids_for_url = record_ids.each do |i|
-      step_one = 'id%7Cbibid%3A' + i + '%20%7C%7C'
-      ids = ids + step_one
-    end
+  headers['Access-Control-Allow-Origin'] = "*"
+  record_ids = params[:ids].split(',')
+  ids = ''
+  ids_for_url = record_ids.each do |i|
+    step_one = 'id%7Cbibid%3A' + i + '%20%7C%7C'
+    ids = ids + step_one
+  end
     
-    url = 'http://catalog.tadl.org/eg/opac/results?loc=22&limit=24&query='+ids+''
-    agent = Mechanize.new
-    page = agent.get(url)
-    html = page.parser
+  url = 'http://catalog.tadl.org/eg/opac/results?loc=22&limit=24&query='+ids+''
+  agent = Mechanize.new
+  page = agent.get(url)
+  html = page.parser
     
     items = html.css(".result_table_row").map do |item| 
       {
