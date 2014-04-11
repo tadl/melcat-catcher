@@ -924,6 +924,30 @@ def get_list
 	end	
 end
 
+def by_id
+    record_ids = params[:ids].split(',')
+    ids = ''
+    ids_for_url = record_ids.each do |i|
+      step_one = 'id%7Cbibid%3A' + i + '%20%7C%7C'
+      ids = ids + step_one
+    end
+    
+    url = 'http://catalog.tadl.org/eg/opac/results?loc=22&limit=24&query='+ids+''
+    agent = Mechanize.new
+    page = agent.get(url)
+    html = page.parser
+    
+    items = html.css(".result_table_row").map do |item| 
+      {
+        :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "),
+        :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+      }
+    end
+    respond_to do |format|
+      format.json { render json: {:items => items}}
+    end
+end
+
 
 def get_token
 agent = login_action(params[:u],params[:pw])
