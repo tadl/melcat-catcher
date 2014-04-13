@@ -9,8 +9,8 @@ require 'nikkou'
 require 'dalli'
 require 'memcachier'
 
-before_filter :set_cache_headers, :only => [:get_list] 
-caches_action :get_list, :cache_path => Proc.new { |c| c.params }, :expires_in => 3.minutes, :race_condition_ttl => 1.minutes
+before_filter :set_cache_headers, :only => [:get_list, :searchjson, :by_id] 
+caches_action :get_list, :searchjson, :by_id, :cache_path => Proc.new { |c| c.params }, :expires_in => 3.minutes, :race_condition_ttl => 1.minutes
 
 def set_cache_headers
     headers['Access-Control-Allow-Origin'] = '*'      

@@ -16,7 +16,7 @@ end
 
 gem 'httparty'
 gem 'multi_xml'
-gem 'nokogiri'
+gem 'nokogiri', '~> 1.6.1' 
 gem 'nikkou'
 gem 'oj'
 gem 'unicorn'
