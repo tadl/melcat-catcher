@@ -58,6 +58,7 @@ youth_resources = JSON.parse(open("https://www.tadl.org/export/node/json/647").r
 youth_award_winners = JSON.parse(open("https://www.tadl.org/export/node/json/644").read)
 youth_homework = JSON.parse(open("https://www.tadl.org/export/node/json/35978").read)
 youth_homeschool = JSON.parse(open("https://www.tadl.org/export/node/json/35979").read)
+youth_staff = JSON.parse(open("https://www.tadl.org/export/node/json/37600").read)
 teens_new = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19050&just_ids=yes").read)
 teens_new_full = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19050&featured=yes").read)
 teens_manga = JSON.parse(open("http://mel-catcher.herokuapp.com/main/get_list.json?list_id=19051&just_ids=yes").read)
@@ -151,6 +152,7 @@ youth = {
 	:youth_award_winners => youth_award_winners,
     :youth_homework => youth_homework,
     :youth_homeschool => youth_homeschool,
+    :youth_staff => youth_staff,
 }
 
 teens = {
