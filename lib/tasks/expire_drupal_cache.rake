@@ -212,6 +212,7 @@ locations = {
 
 
 everything_else = { :time => timestamp,
+    :announcements => announcements,
 	:events_adults => adult_events['nodes'].first(5),
 	:books_featured_fiction => books_featured_fiction, 
 	:books_featured_nonfiction => books_featured_nonfiction, 
@@ -243,6 +244,7 @@ everything_else = { :time => timestamp,
 	:youth_award_winners => youth_award_winners,
     :youth_homework => youth_homework,
     :youth_homeschool => youth_homeschool,
+    :youth_staff => youth_staff,
 	:teens_new => teens_new,
 	:teens_manga => teens_manga,
 	:events_teens => teens_events['nodes'].first(5),
