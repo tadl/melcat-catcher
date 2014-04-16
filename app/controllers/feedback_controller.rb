@@ -1,6 +1,7 @@
 class FeedbackController < ApplicationController
 respond_to :html, :json	
   def staff
+    headers['Access-Control-Allow-Origin'] = '*'   
   	name = params[:name]
   	url = params[:url]
   	agent = request.env['HTTP_USER_AGENT']
