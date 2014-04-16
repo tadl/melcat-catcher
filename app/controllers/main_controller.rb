@@ -692,172 +692,137 @@ end
 end
 
 def search_prefs
-headers['Access-Control-Allow-Origin'] = "*"
-agent = login_action(params[:u],params[:pw])
-
-if params[:new_search_prefs]
-	options = params[:new_search_prefs].split(',')
-
-	if options[1] == 'true'
-	circ_retention = 'on'
-	else
-	circ_retention = 'off'
-	end
-	
-	if options[2] == 'true'
-	hold_retention = 'on'
-	else
-	hold_retention = 'off'
-	end
-	
-	
-	attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_settings', { 
-		"opac.default_pickup_location" => options[0],
-		"history.circ.retention_start" => circ_retention,
-		"history.hold.retention_start" => hold_retention,
-	})
-
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    if params[:new_search_prefs]
+        options = params[:new_search_prefs].split(',')
+        if options[1] == 'true'
+            circ_retention = 'on'
+        else
+            circ_retention = 'off'
+        end
+        if options[2] == 'true'
+            hold_retention = 'on'
+        else
+            hold_retention = 'off'
+        end
+        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_settings', { 
+            "opac.default_pickup_location" => options[0],
+            "history.circ.retention_start" => circ_retention,
+            "history.hold.retention_start" => hold_retention,
+        })
+    end
+    if params[:new_email]	
+        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/update_email', { 
+            "email" => params[:new_email],
+            "current_pw" => params[:pw],
+        })
+    end
+    if params[:new_alias]	
+        page = agent.get("https://catalog.tadl.org/eg/opac/myopac/update_alias")
+        form = agent.page.forms[1]
+        form.field_with(:name => "alias").value = params[:new_alias]
+        form.field_with(:name => "current_pw").value = params[:pw]
+        agent.submit(form)
+    end
+    if params[:new_username]
+    end
+    if params[:new_notify_prefs]
+        options = params[:new_notify_prefs].split(',')
+        if options[0] == 'true'
+            phone_notify = 'on'
+        else
+            phone_notify = 'off'
+        end
+        if options[1] == 'true'
+            email_notify = 'on'
+        else
+            email_notify = 'off'
+        end
+        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_notify', {
+            "opac.hold_notify.email" => email_notify,
+            "opac.hold_notify.phone" => phone_notify,
+        })
+    end
+    page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_settings")
+    @doc = page.parser
+    @pagetitle = @doc.css("title").text
+    @hits_setting = @doc.css('select[@name="opac.hits_per_page"] option[@selected="selected"]').attr('value').text
+    @search_setting = @doc.css('select[@name="opac.default_search_location"] option[@selected="selected"]').attr('value').text
+    @pickup_setting = @doc.css('select[@name="opac.default_pickup_location"] option[@selected="selected"]').attr('value').text
+    if @doc.css('input[@name="history.circ.retention_start"]').attr('checked')
+        @circ_setting = "on"
+    else
+        @circ_setting = "off"
+    end
+    if @doc.css('input[@name="history.hold.retention_start"]').attr('checked')
+        @hold_setting = "on"
+    else
+        @hold_setting = "off"
+    end
+    page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_notify")
+    @doc = page.parser
+    if @doc.css('input[@name="opac.hold_notify.email"]').attr('checked')
+        @hold_notify_email = "on"
+    else
+        @hold_notify_email = "off"
+    end
+    if @doc.css('input[@name="opac.hold_notify.phone"]').attr('checked')
+        @hold_notify_phone = "on"
+    else
+        @hold_notify_phone = "off"
+    end
+    page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs")
+    @doc = page.parser
+    @default_phone = @doc.at_css('td:contains("Day Phone")').try(:next_element).try(:text)
+    @opac_username = @doc.at_css('td:contains("Username")').try(:next_element).try(:text)
+    @email_address = @doc.at_css('td:contains("Email Address")').try(:next_element).try(:text)
+    @hold_shelf_alias = @doc.at_css('td:contains("Holdshelf Alias")').try(:next_element).try(:text)
+    respond_to do |format|
+    format.json { 
+        render :json => { 
+            :settings => {  
+                :pickup => @pickup_setting, 
+                :circ => @circ_setting, 
+                :hold => @hold_setting, 
+                :hold_notify_email => @hold_notify_email,
+                :hold_notify_phone => @hold_notify_phone,
+                :opac_username => @opac_username,
+                :hold_shelf_alias => @hold_shelf_alias,
+                :email_address => @email_address,
+            }
+        }
+    }
+    end
 end
-
-if params[:new_email]	
-	attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/update_email', { 
-		"email" => params[:new_email],
-		"current_pw" => params[:pw],
-	})
-end
-
-if params[:new_alias]	
-	page = agent.get("https://catalog.tadl.org/eg/opac/myopac/update_alias")
-	form = agent.page.forms[1]
-	form.field_with(:name => "alias").value = params[:new_alias]
-	form.field_with(:name => "current_pw").value = params[:pw]
-	agent.submit(form)
-end
-
-if params[:new_username]
-
-
-end
-
-if params[:new_notify_prefs]
-	options = params[:new_notify_prefs].split(',')
-
-	if options[0] == 'true'
-	phone_notify = 'on'
-	else
-	phone_notify = 'off'
-	end
-	
-	if options[1] == 'true'
-	email_notify = 'on'
-	else
-	email_notify = 'off'
-	end
-	
-	
-	attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_notify', {
-		"opac.hold_notify.email" => email_notify,
-		"opac.hold_notify.phone" => phone_notify,
-	})
-
-end
-
-
-
-
-
-page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_settings")
-@doc = page.parser
-@pagetitle = @doc.css("title").text
-@hits_setting = @doc.css('select[@name="opac.hits_per_page"] option[@selected="selected"]').attr('value').text
-@search_setting = @doc.css('select[@name="opac.default_search_location"] option[@selected="selected"]').attr('value').text
-@pickup_setting = @doc.css('select[@name="opac.default_pickup_location"] option[@selected="selected"]').attr('value').text
-if @doc.css('input[@name="history.circ.retention_start"]').attr('checked')
-@circ_setting = "on"
-else
-@circ_setting = "off"
-end
-if @doc.css('input[@name="history.hold.retention_start"]').attr('checked')
-@hold_setting = "on"
-else
-@hold_setting = "off"
-end
-
-page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs_notify")
-@doc = page.parser
-if @doc.css('input[@name="opac.hold_notify.email"]').attr('checked')
-@hold_notify_email = "on"
-else
-@hold_notify_email = "off"
-end
-
-if @doc.css('input[@name="opac.hold_notify.phone"]').attr('checked')
-@hold_notify_phone = "on"
-else
-@hold_notify_phone = "off"
-end
-page = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs")
-@doc = page.parser
-@default_phone = @doc.at_css('td:contains("Day Phone")').try(:next_element).try(:text)
-@opac_username = @doc.at_css('td:contains("Username")').try(:next_element).try(:text)
-@email_address = @doc.at_css('td:contains("Email Address")').try(:next_element).try(:text)
-@hold_shelf_alias = @doc.at_css('td:contains("Holdshelf Alias")').try(:next_element).try(:text)
-
-
-
-
-
-
-
-
-
-
-
-respond_to do |format|
-format.json { render :json => { :settings => {  
-:pickup => @pickup_setting, 
-:circ => @circ_setting, 
-:hold => @hold_setting, 
-:hold_notify_email => @hold_notify_email,
-:hold_notify_phone => @hold_notify_phone,
-:opac_username => @opac_username,
-:hold_shelf_alias => @hold_shelf_alias,
-:email_address => @email_address,
-} } }
-end
-end
-
 
 def login_action(username, password)
-agent = Mechanize.new
-page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
-form = agent.page.forms[1]
-form.field_with(:name => "username").value = username
-form.field_with(:name => "password").value = password
-form.checkbox_with(:name => "persist").check
-agent.submit(form)
-return agent
+    agent = Mechanize.new
+    page = agent.get("https://catalog.tadl.org/eg/opac/login?redirect_to=%2Feg%2Fopac%2Fmyopac%2Fmain")
+    form = agent.page.forms[1]
+    form.field_with(:name => "username").value = username
+    form.field_with(:name => "password").value = password
+    form.checkbox_with(:name => "persist").check
+    agent.submit(form)
+    return agent
 end
-
 
 def create_list
-agent = login_action(params[:u],params[:pw])
-agent.post('/eg/opac/myopac/list/update?loc=22', { 
-"loc" => '22',
-"name" => params[:title],
-"action" => 'create',
-"description" => params[:desc],
-"shared" => params[:share]
-})
-list_page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?')
-doc = list_page.parser
-list_title = 'a:contains("'+params[:title]+'")'
-list_id = doc.at_css(list_title).attr('href').gsub('/eg/opac/myopac/lists?bbid=','')
-
-respond_to do |format|
-format.json { render :json =>{:list_id => list_id}}
-end
-
+    agent = login_action(params[:u],params[:pw])
+    agent.post('/eg/opac/myopac/list/update?loc=22', { 
+        "loc" => '22',
+        "name" => params[:title],
+        "action" => 'create',
+        "description" => params[:desc],
+        "shared" => params[:share]
+    })
+    list_page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?')
+    doc = list_page.parser
+    list_title = 'a:contains("'+params[:title]+'")'
+    list_id = doc.at_css(list_title).attr('href').gsub('/eg/opac/myopac/lists?bbid=','')
+    respond_to do |format|
+        format.json { render :json => { :list_id => list_id } }
+    end
 end
 
 def add_to_list
