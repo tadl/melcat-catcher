@@ -568,6 +568,34 @@ end
 end
 end
 
+def acctinfo
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    page = agent.get("https://catalog.tadl.org")
+    doc = page.parser
+    @user = doc.css("body").map do |item|
+    {
+        user:
+        {
+            :name => item.at_css('#dash_user').try(:text).try(:strip),
+            :checkouts => item.at_css('#dash_checked').try(:text).try(:strip),
+            :holds => item.at_css('#dash_holds').try(:text).try(:strip),
+            :pickups => item.at_css('#dash_pickup').try(:text).try(:strip),
+            :fines => item.at_css('#dash_fines').try(:text).try(:strip),
+        }
+    }
+    end
+
+    if @user.count == 0 || @user[0][:user][:name] == nil
+        respond_to do |format|
+            format.json { render :json => { :status => :error, :message => "Bad token" }}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json => { :users => @user }}
+        end
+    end
+end
 
 def showcheckouts
     headers['Access-Control-Allow-Origin'] = "*"
