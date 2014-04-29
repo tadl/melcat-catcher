@@ -726,6 +726,10 @@ def search_prefs
         agent.submit(form)
     end
     if params[:new_username]
+        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/update_username', {
+            "current_pw" => params[:pw],
+            "username" => params[:new_username],
+        })
     end
     if params[:new_notify_prefs]
         options = params[:new_notify_prefs].split(',')
