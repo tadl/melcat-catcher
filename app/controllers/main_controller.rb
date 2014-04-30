@@ -1071,33 +1071,46 @@ end
 def get_checkout_history
 	headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
+
+    agent.redirect_ok = false
+    status_code = '200'
+
     if params[:page]
         page = params[:page].to_i * 15
     else
         page = 0    
     end
-    url = 'https://catalog.tadl.org/eg/opac/myopac/circ_history?loc=22;limit=15;offset=' + page.to_s
-    page = agent.get(url)
-    doc = page.parser
-    checkout_list = doc.css('#checked_main/table/tbody/tr').map do |c|
-        {
-            :title => c.css('td[1]/a[1]').text,
-            :record_id => c.at_css('td[1]/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
-            :author => c.css('td[1]/a[2]').text,
-            :date_due => c.css('td[3]').text.try(:strip).try(:squeeze, " "),
-            :date_out => c.css('td[2]').text.try(:strip).try(:squeeze, " "),
-            :date_in => c.css('td[4]').text.try(:strip).try(:squeeze, " "),  
-        }
-    end
 
-    if doc.css('.invisible:contains("Next")').present?
-        more = "false"
-    else
-        more = "true"
+    begin
+        url = 'https://catalog.tadl.org/eg/opac/myopac/circ_history?loc=22;limit=15;offset=' + page.to_s
+        page = agent.get(url)
+
+        status_code = page.code
+
+        doc = page.parser
+        checkout_list = doc.css('#checked_main/table/tbody/tr').map do |c|
+            {
+                :title => c.css('td[1]/a[1]').text,
+                :record_id => c.at_css('td[1]/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
+                :author => c.css('td[1]/a[2]').text,
+                :date_due => c.css('td[3]').text.try(:strip).try(:squeeze, " "),
+                :date_out => c.css('td[2]').text.try(:strip).try(:squeeze, " "),
+                :date_in => c.css('td[4]').text.try(:strip).try(:squeeze, " "),  
+            }
+        end
+
+        if doc.css('.invisible:contains("Next")').present?
+            more = "false"
+        else
+            more = "true"
+        end
+
+    rescue Mechanize::ResponseCodeError => ex
+        status_code = ex.response_code
     end
 
     respond_to do |format|
-        format.json { render :json =>{:checkouts => checkout_list, :more => more}}
+        format.json { render :json =>{:checkouts => checkout_list, :more => more, :status => status_code}}
     end 
 
 end
