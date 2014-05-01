@@ -1291,7 +1291,7 @@ def create_new_list
     
     # move all the items to the new list
     url = 'https://catalog.tadl.org/eg/opac/mylist/move?action=' + new_list_id + cat
-    doc = agent.get(url)
+    page = agent.get(url)
     
     # send response (new list id)
     respond_to do |format|
@@ -1299,6 +1299,30 @@ def create_new_list
     end
 
 end
+
+def bulk_add_to_list
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    list_id = params[:list_id]
+    record_ids = params[:record_ids]
+    cat = ''
+
+    recordids = record_ids.split(',')
+    recordids.each do |r|
+        cat << "&record=" + r
+    end
+
+    url = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + record_ids
+    page = agent.get(url)
+
+    url = 'https://catalog.tadl.org/eg/opac/mylist/move?action=' + list_id + cat
+    page = agent.get(url)
+
+    respond_to do |format|
+        format.json { render :json => { :response => "done" }}
+    end
+end
+
 
 def checkupdates
 headers['Access-Control-Allow-Origin'] = "*"
