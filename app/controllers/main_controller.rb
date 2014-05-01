@@ -830,26 +830,26 @@ def create_list
 end
 
 def add_to_list
-    headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
-    record_id_container = ''
-    record_ids = params[:record_ids].split(',')
 
-    list_url = URI.encode('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:list_id])
-    add_to_list_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/add?loc=22;record=' + record_ids[0])
-    post_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/move?action='+ params[:list_id] +'&loc=22&'+ record_id_container)
+record_id_container = ''
+record_ids = params[:record_ids].split(',')
+record_ids.each do |r| 
+record = 'record=' + r + '&'
+record_id_container = record_id_container + record
+end
 
-    record_ids.each do |r| 
-        record = 'record=' + r + '&'
-        record_id_container = record_id_container + record
-    end
+list_url = URI.encode('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:list_id])
+add_to_list_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/add?loc=22;record=' + record_ids[0])
+post_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/move?action='+ params[:list_id] +'&loc=22&'+ record_id_container)
 
-    agent.get(add_to_list_url)
-    agent.get(post_url, [], list_url) 
+agent = login_action(params[:u],params[:pw])
+agent.get(add_to_list_url)
+agent.get(post_url, [], list_url) 
 
-    respond_to do |format|
-        format.json { render :json =>{:message => @post_url}}
-    end
+respond_to do |format|
+format.json { render :json =>{:message => @post_url}}
+end
+
 end
 
 
