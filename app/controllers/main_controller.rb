@@ -854,26 +854,33 @@ end
 
 
 def get_list
-	if params[:page]
-	page = params[:page]
-	else
-	page = 0
-	end
-	if params[:available] == 'yes'
-	available = '&modifier=available'
-	else
-	available = ''
-	end
+    if params[:page]
+        page = params[:page]
+    else
+        page = 0
+    end
+
+    if params[:available] == 'yes'
+        available = '&modifier=available'
+    else
+        available = ''
+    end
+
+    if params[:token]
+        agent = set_token(params[:token])
+    else
+        agent = Mechanize.new
+    end
+
 	list_id = params[:list_id].to_s
 	page_number = page.to_s
-	
+
 	url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=20' + available +'&page='+ page_number +'&locg=22'
-	
-	agent = Mechanize.new
+
 	page = agent.get(url)
 	doc = page.parser
-	
-	
+
+
 	list_name = doc.css(".result-bookbag-name").text
 	list_id = list_id
 	if params[:just_ids] == 'yes'
@@ -1222,16 +1229,21 @@ end
 def create_new_list
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
-    # fetch params
+
+    # fetch params and set up vars
     listname = params[:name]
-    recordids = params[:ids].split(',')
+    records = params[:ids]
+    recordids = records.split(',')
     cat = ''
-    # add items to list and build move component
+
+    # build move component
     recordids.each do |r|
-        url = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + r
-        page = agent.get(url)
         cat << "&record=" + r
     end
+
+    # add items to temporary list
+    url = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + records
+    page = agent.get(url)
 
     # create the new list
     url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'

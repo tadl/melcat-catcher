@@ -24,7 +24,6 @@ Ilscatcher::Application.routes.draw do
   get "melcat/hold"
   get "main/search_prefs"
   get "main/create_new_list"
-  get "main/bulk_add_to_list"
   get "main/create_list"
   get "main/add_to_list"
   get "main/get_list"
