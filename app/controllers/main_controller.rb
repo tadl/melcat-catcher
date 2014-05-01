@@ -1171,11 +1171,11 @@ def get_user_lists
 	page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists')
 	doc = page.parser
 	lists = doc.css('.bookbag-controls-holder').map do |l|
-    {
-		:list_name => l.at_css('h2').text,
-		:list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
-        :list_desc => l.css('.bookbag-description').text,
-    }
+        {
+            :list_name => l.at_css('h2').text,
+            :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
+            :list_desc => l.css('.bookbag-description').text,
+        }
 	end
 	offset = 0
 	added_value = 10
@@ -1185,11 +1185,11 @@ def get_user_lists
 		page = agent.get(url)
 		doc = page.parser
 		page_list = doc.css('.bookbag-controls-holder').map do |l|
-        {
-			:list_name => l.at_css('h2').text,
-			:list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
-            :list_desc => l.css('.bookbag-description').text,
-        }
+            {
+                :list_name => l.at_css('h2').text,
+                :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
+                :list_desc => l.css('.bookbag-description').text,
+            }
 		end
 		lists = lists + page_list
 	end
@@ -1202,28 +1202,95 @@ end
 
 
 def remove_from_list
-	headers['Access-Control-Allow-Origin'] = "*"
-	agent = set_token(params[:token])
-	agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;')
-	url = '/eg/opac/myopac/list/update?loc=22'
-	agent.post(url, { 
-		"bbid" => params[:list_id],
-		"loc" => '22',
-		"sort" => "",
-		"list" => params[:list_id],
-		"selected_item" => params[:list_item_id],
-		"action" => params[:action],
-	})
-	respond_to do |format|
-		format.json { render :json => 'done'}
-	end	
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;')
+    url = '/eg/opac/myopac/list/update?loc=22'
+    agent.post(url, { 
+        "bbid" => params[:list_id],
+        "loc" => '22',
+        "sort" => "",
+        "list" => params[:list_id],
+        "selected_item" => params[:list_item_id],
+        "action" => params[:action],
+    })
+    respond_to do |format|
+        format.json { render :json => 'done'}
+    end	
+end
 
+def create_new_list
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    # fetch params
+    listname = params[:name]
+    recordids = params[:ids].split(',')
+    cat = ''
+    # add items to list and build move component
+    recordids.each do |r|
+        url = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + r
+        page = agent.get(url)
+        cat << "&record=" + r
+    end
 
+    # create the new list
+    url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'
+    agent.post(url, {
+        "action" => "create",
+        "name" => listname,
+        "shared" => "0",
+    })
+    
+    # get a list of all lists
+    url = 'https://catalog.tadl.org/eg/opac/myopac/lists'
+    page = agent.get(url)
+    doc = page.parser
+    lists = doc.css('.bookbag-controls-holder').map do |l|
+        {
+            :list_name => l.at_css('h2').text,
+            :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
+            :list_desc => l.css('.bookbag-description').text,
+        }
+    end
+    offset = 0
+    added_value = 10
+    until doc.css('.invisible:contains("Next")').present? == true
+        offset = offset + added_value
+        url = 'https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;limit=10;offset=' + offset.to_s
+        page = agent.get(url)
+        doc = page.parser
+        page_list = doc.css('.bookbag-controls-holder').map do |l|
+            {
+                :list_name => l.at_css('h2').text,
+                :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
+                :list_desc => l.css('.bookbag-description').text,
+            }
+        end
+        lists = lists + page_list
+    end
 
+    # get the ID of the new list from the list of lists
+    new_list_id = []
+    lists.each do |foo|
+        if (foo[:list_name] == listname)
+            new_list_id = foo[:list_id]
+        end
+    end
+    
+    # move all the items to the new list
+    url = 'https://catalog.tadl.org/eg/opac/mylist/move?action=' + new_list_id + cat
+    doc = agent.get(url)
+    
+    # send response (new list id)
+    respond_to do |format|
+        format.json { render :json => { :listid => new_list_id  }}
+    end
 
 end
 
-
+def bulk_add_to_list
+    # this is the simple one. We know the list id and we know the items!
+end
 
 
 def checkupdates
