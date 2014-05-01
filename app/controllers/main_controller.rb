@@ -830,6 +830,7 @@ def create_list
 end
 
 def add_to_list
+    headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
     record_id_container = ''
     record_ids = params[:record_ids].split(',')
@@ -1298,11 +1299,6 @@ def create_new_list
     end
 
 end
-
-def bulk_add_to_list
-    # this is the simple one. We know the list id and we know the items!
-end
-
 
 def checkupdates
 headers['Access-Control-Allow-Origin'] = "*"
