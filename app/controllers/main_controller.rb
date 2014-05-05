@@ -1172,6 +1172,23 @@ def get_user_with_token
 	end	
 end
 
+# This can probably be replaced by the function that already existed
+# though it will probably need to be rewritten a bit.
+def remove_list_item
+    headers['Access-Control-Allow-Origin'] = "*"
+    agent = set_token(params[:token])
+    agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:listid])
+    url = 'https://catalog.tadl.org/eg/opac/myopac/list/update?loc=22;bbid=' + params[:listid]
+    page = agent.post(url, {
+        "list" => params[:listid],
+        "selected_item" => params[:itemid],
+        "action" => "del_item",
+    })
+    respond_to do |format|
+        format.json { render :json => {:result => "done"}}
+    end
+end
+
 def get_user_lists
 	headers['Access-Control-Allow-Origin'] = "*"
 	agent = set_token(params[:token])
