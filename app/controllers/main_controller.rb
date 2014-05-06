@@ -917,13 +917,12 @@ def get_list
 		  	:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
 		  	:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
 		  	:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
-		  	:list_item_id => item.at_css(".list-item-id").attr('title'),
+		  	:list_item_id => item.at_css(".list-item-id").try(:attr, "title"),
 		  	:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
 		  	:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
 		  	:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
 		  	:record_year => item.at_css(".record_year").try(:text),
 		  	:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-          :bag_item_id => item.at_css('abbr').try(:attr, "title"), 
 		  	}
 		  end
     end 
