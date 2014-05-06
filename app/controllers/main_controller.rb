@@ -536,7 +536,7 @@ end
 def login
 headers['Access-Control-Allow-Origin'] = "*"
 agent = login_action(params[:u],params[:pw])
-page = agent.get("https://catalog.tadl.org")
+page = agent.get("https://catalog.tadl.org/eg/opac/myopac/main")
 @doc = page.parser
 
 @user = @doc.css("body").map do |item| 
@@ -544,6 +544,7 @@ page = agent.get("https://catalog.tadl.org")
 user:
 {
 :name => item.at_css('#dash_user').try(:text).try(:strip),
+:melcat_id => item.at_css('p:contains("Your MeLCat ID")').try(:text).try(:gsub!, "Your MeLCat ID is:","").try(:strip), 
 :checkouts => item.at_css('#dash_checked').try(:text).try(:strip),
 :holds => item.at_css('#dash_holds').try(:text).try(:strip),
 :pickups => item.at_css('#dash_pickup').try(:text).try(:strip),
