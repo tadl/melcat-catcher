@@ -921,7 +921,8 @@ def get_list
 		  	:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
 		  	:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
 		  	:record_year => item.at_css(".record_year").try(:text),
-		  	:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
+		  	:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+          :bag_item_id => item.at_css('abbr').try(:attr, "title"), 
 		  	}
 		  end
     end 
