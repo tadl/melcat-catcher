@@ -668,6 +668,7 @@ def showpickups
             :author => checkout.css("/td[3]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
             :format_icon => checkout.css("/td[4]/div/img").attr('src').text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
             :image => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+            :record_id => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").split("/").last,
             :pickup_location => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
             :active => checkout.css("/td[8]").text.to_s.squeeze().strip().squeeze().starts_with?('A'),
             :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
@@ -1172,16 +1173,17 @@ def get_user_with_token
 	end	
 end
 
-# This can probably be replaced by the function that already existed
-# though it will probably need to be rewritten a bit.
+
+#THIS DOES NOT WORK
 def remove_list_item
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
-    agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:listid])
-    url = 'https://catalog.tadl.org/eg/opac/myopac/list/update?loc=22;bbid=' + params[:listid]
+    page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:listid])
+    doc = page.parser
+    url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'
     page = agent.post(url, {
         "list" => params[:listid],
-        "selected_item" => params[:itemid],
+        "selected_item" => SOMETHING,
         "action" => "del_item",
     })
     respond_to do |format|
