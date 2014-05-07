@@ -967,14 +967,67 @@ test = agent.cookies.detect { |t| t.name == 'ses' }
 end
 
 
-def set_token(token)
+def set_token(token, url = '', params = '')
 	agent = Mechanize.new
 	cookie = Mechanize::Cookie.new('ses', token)
 	cookie.domain = "catalog.tadl.org"
 	cookie.path = "/"
 	agent.cookie_jar.add!(cookie)
-	return agent
+    if url != ''
+       if params != '' 
+            page = agent.post(url, params)
+            return agent, page
+       else
+            agent.redirect_ok = false
+            page = agent.get(url)
+            return agent, page
+       end 
+    else
+            return agent
+    end   
+
 end
+
+def get_hold_history
+    headers['Access-Control-Allow-Origin'] = "*"
+    if params[:page]
+        page_number = params[:page].to_i * 15
+    else
+        page_number = 0
+    end
+    url = 'https://catalog.tadl.org/eg/opac/myopac/hold_history?loc=22;limit=15;offset=' + page_number.to_s
+    #Jeff might no a better way to handle things when we don't have values to pass a function
+    prepare_agent = set_token(params[:token], url)
+    # preparge_agent returns an array with agent and page in that order
+    page = prepare_agent[1]
+    if page.code == '200'
+        doc = page.parser
+        hold_list = doc.css('#holds_main/table/tbody/tr').map do |c|
+            {
+                :title => c.css('td[1]/div/a[1]').text,
+                :record_id => c.at_css('td[1]/div/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
+                :author => c.css('td[2]/div/a[1]').text,
+            }
+        end
+    
+        if doc.css('.invisible:contains("next")').present?
+            more = "false"
+        else
+            more = "true"
+        end
+
+        respond_to do |format|
+            format.json { render :json =>{:holds => hold_list, :more => more}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:message => 'badness', :status => page.code}}
+        end
+    end    
+end
+
+
+
 
 # DEVEL
 # @marc = @doc.at_css('.marc_table').to_s.gsub(/\n/,'').gsub(/\t/,'')
@@ -1079,23 +1132,17 @@ end
 
 def get_checkout_history
 	headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
-
-    agent.redirect_ok = false
-    status_code = '200'
-
+    
     if params[:page]
-        page = params[:page].to_i * 15
+        page_number = params[:page].to_i * 15
     else
-        page = 0    
+        page_number = 0    
     end
 
-    begin
-        url = 'https://catalog.tadl.org/eg/opac/myopac/circ_history?loc=22;limit=15;offset=' + page.to_s
-        page = agent.get(url)
-
-        status_code = page.code
-
+    url = 'https://catalog.tadl.org/eg/opac/myopac/circ_history?loc=22;limit=15;offset=' + page_number.to_s
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
         doc = page.parser
         checkout_list = doc.css('#checked_main/table/tbody/tr').map do |c|
             {
@@ -1107,53 +1154,23 @@ def get_checkout_history
                 :date_in => c.css('td[4]').text.try(:strip).try(:squeeze, " "),  
             }
         end
-
+    
         if doc.css('.invisible:contains("Next")').present?
             more = "false"
         else
             more = "true"
         end
-
-    rescue Mechanize::ResponseCodeError => ex
-        status_code = ex.response_code
-    end
-
-    respond_to do |format|
-        format.json { render :json =>{:checkouts => checkout_list, :more => more, :status => status_code}}
-    end 
-
+            
+        respond_to do |format|
+            format.json { render :json =>{:checkouts => checkout_list, :more => more}}
+        end 
+    else
+        respond_to do |format|
+            format.json { render :json =>{:message => "badness", :status => page.code}}
+        end 
+    end    
 end
 
-def get_hold_history
-	headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
-    if params[:page]
-        page = params[:page].to_i * 15
-    else
-        page = 0
-    end
-    url = 'https://catalog.tadl.org/eg/opac/myopac/hold_history?loc=22;limit=15;offset=' + page.to_s
-    page = agent.get(url)
-    doc = page.parser
-    hold_list = doc.css('#holds_main/table/tbody/tr').map do |c|
-        {
-            :title => c.css('td[1]/div/a[1]').text,
-            :record_id => c.at_css('td[1]/div/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
-            :author => c.css('td[2]/div/a[1]').text,
-        }
-    end
-
-    if doc.css('.invisible:contains("next")').present?
-        more = "false"
-    else
-        more = "true"
-    end
-
-    respond_to do |format|
-        format.json { render :json =>{:holds => hold_list, :more => more}}
-    end
-
-end
 
 
 def get_user_with_token
@@ -1223,22 +1240,23 @@ def get_user_lists
 end
 
 
-
+#updated but needs to do something else to verify if things work as expected
 def remove_from_list
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
-    agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;')
-    url = '/eg/opac/myopac/list/update?loc=22'
-    agent.post(url, { 
-        "bbid" => params[:list_id],
+    url = 'https://catalog.tadl.org/eg/opac/myopac/list/update?loc=22'
+    post_params =  { 
         "loc" => '22',
         "sort" => "",
         "list" => params[:list_id],
         "selected_item" => params[:list_item_id],
-        "action" => params[:action],
-    })
+        "action" => 'del_item',
+    }
+
+    prepare_agent = set_token(params[:token], url, post_params)
+    page = prepare_agent[1]
+#will always return 200 as even with bad token the redirect is successful, need to parse page for something or use another option
     respond_to do |format|
-        format.json { render :json => 'done'}
+        format.json { render :json => page.code}
     end	
 end
 
