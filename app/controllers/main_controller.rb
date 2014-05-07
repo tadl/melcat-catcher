@@ -1174,17 +1174,13 @@ def get_user_with_token
 	end	
 end
 
-
-#THIS DOES NOT WORK
 def remove_list_item
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])
-    page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:listid])
-    doc = page.parser
     url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'
     page = agent.post(url, {
         "list" => params[:listid],
-        "selected_item" => SOMETHING,
+        "selected_item" => params[:itemid],
         "action" => "del_item",
     })
     respond_to do |format|
