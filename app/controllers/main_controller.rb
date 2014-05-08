@@ -1161,7 +1161,7 @@ def get_checkout_history
         end
             
         respond_to do |format|
-            format.json { render :json =>{:checkouts => checkout_list, :more => more}}
+            format.json { render :json =>{:checkouts => checkout_list, :more => more, :status => page.code}}
         end 
     else
         respond_to do |format|
