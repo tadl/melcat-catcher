@@ -975,17 +975,16 @@ def set_token(token, url = '', params = '')
 	agent.cookie_jar.add!(cookie)
     if url != ''
        if params != '' 
-            page = agent.post(url, params)
+            page = agent.post(url, params) rescue page = Mechanize::Page.new(uri = nil, response = nil, body = nil, code = '500', mech = nil)
             return agent, page
        else
             agent.redirect_ok = false
-            page = agent.get(url)
+            page = agent.get(url) rescue page = Mechanize::Page.new(uri = nil, response = nil, body = nil, code = '500', mech = nil)
             return agent, page
        end 
     else
             return agent
     end   
-
 end
 
 def get_hold_history
@@ -1000,7 +999,7 @@ def get_hold_history
     prepare_agent = set_token(params[:token], url)
     # preparge_agent returns an array with agent and page in that order
     page = prepare_agent[1]
-    if page.code == '200'
+    if page.code == '200' 
         doc = page.parser
         hold_list = doc.css('#holds_main/table/tbody/tr').map do |c|
             {
@@ -1142,7 +1141,7 @@ def get_checkout_history
     url = 'https://catalog.tadl.org/eg/opac/myopac/circ_history?loc=22;limit=15;offset=' + page_number.to_s
     prepare_agent = set_token(params[:token], url)
     page = prepare_agent[1]
-    if page.code == '200'
+    if  page.code == '200' 
         doc = page.parser
         checkout_list = doc.css('#checked_main/table/tbody/tr').map do |c|
             {
