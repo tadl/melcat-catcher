@@ -600,97 +600,124 @@ end
 
 def showcheckouts
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
     url = 'https://catalog.tadl.org/eg/opac/myopac/circs?loc=22'
-    page = agent.get(url)
-    @doc = page.parser
-    @pagetitle = @doc.css("title").text
-    @checkouts = @doc.css('//table[1]/tr')[1..-1].map do |checkout|
-    {
-        checkout:
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        @doc = page.parser
+        @pagetitle = @doc.css("title").text
+        @checkouts = @doc.css('//table[1]/tr')[1..-1].map do |checkout|
         {
-            :checkout_id => checkout.at('td[1]/input')['value'],
-            :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
-            :image => checkout.at_css("/td[2]/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-            :record_id => checkout.at_css('td[2]/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
-            :renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-            :due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-            :format_icon => checkout.css("/td[3]/img").attr("src").text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
-            :barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            checkout:
+            {
+                :checkout_id => checkout.at('td[1]/input')['value'],
+                :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
+                :image => checkout.at_css("/td[2]/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                :record_id => checkout.at_css('td[2]/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
+                :renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                :due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                :format_icon => checkout.css("/td[3]/img").attr("src").text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                :barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+            }
         }
-    }
-    end 
+        end 
 
-    respond_to do |format|
-        format.json { render :json => Oj.dump(checkouts: @checkouts)}
+        respond_to do |format|
+            format.json { render :json => { :checkouts => @checkouts, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
     end
 end
 
 def showholds
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
-    checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds")
-    @doc = checkoutpage.parser
-    @pagetitle = @doc.css("title").text
-    @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
-    {
-        hold:
+    url = 'https://catalog.tadl.org/eg/opac/myopac/holds'
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        @doc = page.parser
+        @pagetitle = @doc.css("title").text
+        @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
         {
-            :hold_id => checkout.at('td[1]/div/input')['value'],
-            :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
-            :image => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-            :record_id => checkout.at_css('td[2]/div/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
-            :author => checkout.css("/td[3]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-            :format_icon => checkout.css("/td[4]/div/img").attr('src').text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
-            :pickup_location => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-            :active => checkout.css("/td[8]").text.to_s.squeeze().strip().squeeze().starts_with?('A'),
-            :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
+            hold:
+            {
+                :hold_id => checkout.at('td[1]/div/input')['value'],
+                :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
+                :image => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                :record_id => checkout.at_css('td[2]/div/a[1]').attr('href').gsub('/eg/opac/record/','').split('?')[0],
+                :author => checkout.css("/td[3]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                :format_icon => checkout.css("/td[4]/div/img").attr('src').text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                :pickup_location => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                :active => checkout.css("/td[8]").text.to_s.squeeze().strip().squeeze().starts_with?('A'),
+                :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
+            }
         }
-    }
-    end 
-    respond_to do |format|
-        format.json { render :json => Oj.dump(holds: @holds)}
+        end 
+        respond_to do |format|
+            format.json { render :json => {:holds => @holds, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json => {:status => page.code}}
+        end
     end
 end
 
 
 def showpickups
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
-    checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?available=1")
-    @doc = checkoutpage.parser
-    @pagetitle = @doc.css("title").text
-    @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
-    {
-        hold:
+    url = 'https://catalog.tadl.org/eg/opac/myopac/holds?available=1'
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        @doc = page.parser
+        @pagetitle = @doc.css("title").text
+        @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
         {
-            :hold_id => checkout.at('td[1]/div/input')['value'],
-            :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
-            :author => checkout.css("/td[3]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-            :format_icon => checkout.css("/td[4]/div/img").attr('src').text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
-            :image => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-            :record_id => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").split("/").last,
-            :pickup_location => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-            :active => checkout.css("/td[8]").text.to_s.squeeze().strip().squeeze().starts_with?('A'),
-            :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
+            hold:
+            {
+                :hold_id => checkout.at('td[1]/div/input')['value'],
+                :name => checkout.css("/td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " "),
+                :author => checkout.css("/td[3]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                :format_icon => checkout.css("/td[4]/div/img").attr('src').text.try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                :image => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                :record_id => checkout.at_css("/td[2]/div/a/img").try(:attr, "src").split("/").last,
+                :pickup_location => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                :active => checkout.css("/td[8]").text.to_s.squeeze().strip().squeeze().starts_with?('A'),
+                :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
+            }
         }
-    }
-    end 
+        end 
 
-    respond_to do |format|
-        format.json { render :json => Oj.dump(holds: @holds)}
+        respond_to do |format|
+            format.json { render :json => {:holds => @holds, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json => {:status => page.code}}
+        end
     end
 end
 
 def showcard
-headers['Access-Control-Allow-Origin'] = "*"
-agent = set_token(params[:token])
-accountdetails = agent.get("https://catalog.tadl.org/eg/opac/myopac/prefs?loc=22")
-@doc = accountdetails.parser
-@barcode = @doc.css('.active_barcode').text
-respond_to do |format|
-format.json { render :json => { :barcode => @barcode}}
-end
+    headers['Access-Control-Allow-Origin'] = "*"
+    url = 'https://catalog.tadl.org/eg/opac/myopac/prefs'
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        @doc = page.parser
+        @barcode = @doc.css('.active_barcode').text
+        respond_to do |format|
+            format.json { render :json => { :barcode => @barcode, :status => page.code }}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json => { :status => page.code }}
+        end
+    end
 end
 
 def search_prefs
@@ -832,35 +859,36 @@ def create_list
 end
 
 def add_to_list
+    record_id_container = ''
+    record_ids = params[:record_ids].split(',')
+    record_ids.each do |r| 
+        record = 'record=' + r + '&'
+        record_id_container = record_id_container + record
+    end
 
-record_id_container = ''
-record_ids = params[:record_ids].split(',')
-record_ids.each do |r| 
-record = 'record=' + r + '&'
-record_id_container = record_id_container + record
-end
+    list_url = URI.encode('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:list_id])
+    add_to_list_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/add?loc=22;record=' + record_ids[0])
+    post_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/move?action='+ params[:list_id] +'&loc=22&'+ record_id_container)
 
-list_url = URI.encode('https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;bbid=' + params[:list_id])
-add_to_list_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/add?loc=22;record=' + record_ids[0])
-post_url = URI.encode('https://catalog.tadl.org/eg/opac/mylist/move?action='+ params[:list_id] +'&loc=22&'+ record_id_container)
+    agent = login_action(params[:u],params[:pw])
+    agent.get(add_to_list_url)
+    agent.get(post_url, [], list_url) 
 
-agent = login_action(params[:u],params[:pw])
-agent.get(add_to_list_url)
-agent.get(post_url, [], list_url) 
-
-respond_to do |format|
-format.json { render :json =>{:message => @post_url}}
-end
+    respond_to do |format|
+        format.json { render :json =>{:message => @post_url}}
+    end
 
 end
 
 
 def get_list
+    list_id = params[:list_id].to_s
     if params[:page]
         page = params[:page]
     else
         page = 0
     end
+    page_number = page.to_s
 
     if params[:available] == 'yes'
         available = '&modifier=available'
@@ -868,68 +896,69 @@ def get_list
         available = ''
     end
 
+    url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=20' + available +'&page='+ page_number +'&locg=22'
+
     if params[:token]
-        agent = set_token(params[:token])
+        prepare_agent = set_token(params[:token], url)
+        page = prepare_agent[1]
     else
         agent = Mechanize.new
+        page = agent.get(url)
     end
 
-	list_id = params[:list_id].to_s
-	page_number = page.to_s
-
-	url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=20' + available +'&page='+ page_number +'&locg=22'
-
-	page = agent.get(url)
-	doc = page.parser
-
-
-	list_name = doc.css(".result-bookbag-name").text
-	list_id = list_id
-	if params[:just_ids] == 'yes'
-	
-		itemlist = doc.css(".result_table_row").take(6).map do |item| 
-			{
-			:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
-			}
-		end 
-	else
-		if params[:featured] == 'yes'
-      itemlist = doc.css(".result_table_row").take(20).map do |item| 
-        {
-        :title => item.at_css(".bigger").text.strip, 
-        :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-        :availability => '', 
-        :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
-        :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
-        :list_item_id => item.at_css(".list-item-id").attr('title'),
-        :image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-        :abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
-        :contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
-        :record_year => item.at_css(".record_year").try(:text),
-        :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
-        }
-      end
+    if page.code == '200'
+        doc = page.parser
+        list_name = doc.css(".result-bookbag-name").text
+        list_id = list_id
+        if params[:just_ids] == 'yes'
+            itemlist = doc.css(".result_table_row").take(6).map do |item| 
+                {
+                    :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+                }
+            end 
+        else
+            if params[:featured] == 'yes'
+                itemlist = doc.css(".result_table_row").take(20).map do |item| 
+                    {
+                        :title => item.at_css(".bigger").text.strip, 
+                        :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
+                        :availability => '', 
+                        :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
+                        :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+                        :list_item_id => item.at_css(".list-item-id").attr('title'),
+                        :image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                        :abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
+                        :contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
+                        :record_year => item.at_css(".record_year").try(:text),
+                        :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
+                    }
+                end
+            else
+                itemlist = doc.css(".result_table_row").map do |item| 
+                    {
+                        :title => item.at_css(".bigger").text.strip, 
+                        :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
+                        :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+                        :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
+                        :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
+                        :list_item_id => item.at_css(".list-item-id").try(:attr, "title"),
+                        :image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                        :abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
+                        :contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
+                        :record_year => item.at_css(".record_year").try(:text),
+                        :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
+                    }
+                end
+            end 
+        end
+        respond_to do |format|
+            format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist, :status => page.code}}
+        end
     else
-      itemlist = doc.css(".result_table_row").map do |item| 
-		  	{
-		  	:title => item.at_css(".bigger").text.strip, 
-		  	:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-		  	:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
-		  	:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
-		  	:record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
-		  	:list_item_id => item.at_css(".list-item-id").try(:attr, "title"),
-		  	:image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-		  	:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
-		  	:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
-		  	:record_year => item.at_css(".record_year").try(:text),
-		  	:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
-		  	}
-		  end
-    end 
-	end
-	respond_to do |format|
-		format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist}}
-	end	
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
+    end
 end
 
 def by_id
