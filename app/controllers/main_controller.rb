@@ -480,41 +480,49 @@ end
 
 
 def renew
-headers['Access-Control-Allow-Origin'] = "*"
-@circ_id = params[:circ_id]
-@barcode = params[:bc]
-agent = set_token(params[:token])
-renew = agent.get('https://catalog.tadl.org/eg/opac/myopac/circs?&action=renew&circ='+ @circ_id +'')
-@doc = renew.parser
-@renew_summary = @doc.css(".renew-summary").text
-@checkouts = @doc.search('tr').text_includes(@barcode).map do |checkout|
-{
-checkout:
-{
-:name => checkout.at_css("/td[2]").try(:text).try(:strip).try(:gsub!, /\n/," ").try(:squeeze, " "),
-:renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-:checkout_id => checkout.at('td[1]/input')['value'],
-:barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-}
-}
+    headers['Access-Control-Allow-Origin'] = "*"
+    circ_id = params[:circ_id]
+    barcode = params[:bc]
+    url = 'https://catalog.tadl.org/eg/opac/myopac/circs?action=renew&circ=' + circ_id
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        doc = page.parser
+        renew_summary = doc.css(".renew-summary").text
+        checkouts = doc.search('tr').text_includes(barcode).map do |checkout|
+            {
+                checkout:
+                    {
+                        :name => checkout.at_css("/td[2]").try(:text).try(:strip).try(:gsub!, /\n/," ").try(:squeeze, " "),
+                        :renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                        :due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                        :checkout_id => checkout.at('td[1]/input')['value'],
+                        :barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+                    }
+            }
+        end
+
+        respond_to do |format|
+            format.json { render :json =>{:checkouts => checkouts, :response => renew_summary, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
+    end
 end
 
-respond_to do |format|
-format.json { render :json => Oj.dump(:checkouts => @checkouts, :response => @renew_summary)}
-end
-end
 
 def cancelhold
-headers['Access-Control-Allow-Origin'] = "*"
-@hold_id = params[:hold_id]
-agent = set_token(params[:token])
-renew = agent.get('https://catalog.tadl.org/eg/opac/myopac/holds?&action=cancel&hold_id='+ @hold_id +'')
+    headers['Access-Control-Allow-Origin'] = "*"
+    hold_id = params[:hold_id]
+    url = 'https://catalog.tadl.org/eg/opac/myopac/holds?action=cancel&hold_id=' + hold_id
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
 
-respond_to do |format|
-format.json { render :json => Oj.dump("Hello")}
-end
-
+    respond_to do |format|
+        format.json { render :json => {:status => page.code}}
+    end
 end
 
 
