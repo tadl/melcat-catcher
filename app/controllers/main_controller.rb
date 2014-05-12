@@ -9,44 +9,44 @@ require 'nikkou'
 require 'dalli'
 require 'memcachier'
 
-before_filter :set_cache_headers, :only => [:get_list, :searchjson, :by_id] 
+before_filter :set_cache_headers, :only => [:get_list, :searchjson, :by_id]
 caches_action :get_list, :searchjson, :by_id, :cache_path => Proc.new { |c| c.params }, :expires_in => 5.minutes
 
 def set_cache_headers
-    headers['Access-Control-Allow-Origin'] = '*'      
+    headers['Access-Control-Allow-Origin'] = '*'
 end
 
 def index
- 
+
 if params[:q].present?
 @searchquery = params[:q]
-@searchqueryclearned = CGI::escape(@searchquery)    
+@searchqueryclearned = CGI::escape(@searchquery)
 else
-@searchqueryclearned = ""       
-end    
+@searchqueryclearned = ""
+end
 
 if params[:sort].present?
  if params[:sort] == "RELEVANCE"
     @sorttype = "&sort="
-    @sortdefault ="RELEVANCE" 
+    @sortdefault ="RELEVANCE"
     elsif params[:sort] == "NEWEST TO OLDEST"
     @sorttype = "&sort=pubdate.descending"
-    @sortdefault ="NEWEST TO OLDEST" 
+    @sortdefault ="NEWEST TO OLDEST"
     elsif params[:sort] == "OLDEST TO NEWEST"
     @sorttype = "&sort=pubdate"
-    @sortdefault ="OLDEST TO NEWEST" 
+    @sortdefault ="OLDEST TO NEWEST"
     else
     @sorttype = "&sort="
-    @sortdefault ="RELEVANCE" 
+    @sortdefault ="RELEVANCE"
     end
 else
 @sorttype=""
 end
 
-if params[:mt].present?    
+if params[:mt].present?
     if params[:mt] == "MOVIES"
     @mediatype = "format=g"
-    @fdefault ="MOVIES"    
+    @fdefault ="MOVIES"
     elsif params[:mt] == "BOOKS"
     @mediatype = "format=at"
     @fdefault = "BOOKS"
@@ -67,14 +67,14 @@ if params[:mt].present?
     @fdefault = "MUSIC"
     elsif params[:mt] == "VIDEO GAMES"
     @mediatype = "format=mVG&facet=subject%7Cgenre%5Bgame%5D"
-    @fdefault = "VIDEO GAMES" 
+    @fdefault = "VIDEO GAMES"
     elsif params[:mt] == "ALL"
     @mediatype = "format="
-    @fdefault = "ALL" 
+    @fdefault = "ALL"
     end
 end
 
-if params[:st].present? 
+if params[:st].present?
 if params[:st] == "KEYWORD"
 @searchby = "&qtype=keyword"
 @stdefault = "KEYWORD"
@@ -97,23 +97,23 @@ else
 end
 
 
-  
+
 if params[:q].present? && params[:mt].present?
 
 @pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg=22&limit=24' + @sorttype +''
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
-@querytitle = @pagetitle.gsub("http://catalog.tadl.org/", '') 
-@querytitle2 = @querytitle.gsub(".", '%2E')  
+@querytitle = @pagetitle.gsub("http://catalog.tadl.org/", '')
+@querytitle2 = @querytitle.gsub(".", '%2E')
 @cleanquerytitle = CGI::escape(@querytitle2)
 elsif params[:mt].present?
 @pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=&qtype=keyword&fi%3A'+ @mediatype +''+ @avail +'&locg=22&limit=24' + @sorttype +''
 url = @pagetitle
-@doc = Nokogiri::HTML(open(url))  
+@doc = Nokogiri::HTML(open(url))
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
-@querytitle = @pagetitle.gsub("http://catalog.tadl.org/", '') 
-@querytitle2 = @querytitle.gsub(".", '%2E')  
+@querytitle = @pagetitle.gsub("http://catalog.tadl.org/", '')
+@querytitle2 = @querytitle.gsub(".", '%2E')
 @cleanquerytitle = CGI::escape(@querytitle2)
 
 end
@@ -127,13 +127,13 @@ end
 
 def searchjson
 headers['Access-Control-Allow-Origin'] = "*"
- 
+
 if params[:q].present?
 @searchquery = params[:q]
-@searchqueryclearned = CGI::escape(@searchquery)    
+@searchqueryclearned = CGI::escape(@searchquery)
 else
-@searchqueryclearned = ""       
-end    
+@searchqueryclearned = ""
+end
 
 if params[:p].present?
 @nextpage = params[:p]
@@ -168,10 +168,10 @@ end
 
 
 
-if params[:mt].present?    
+if params[:mt].present?
     if params[:mt] == "MOVIES"
     @mediatype = "format=g"
-    @fdefault ="MOVIES"    
+    @fdefault ="MOVIES"
     elsif params[:mt] == "BOOKS"
     @mediatype = "format=at"
     @fdefault = "BOOKS"
@@ -192,16 +192,16 @@ if params[:mt].present?
     @fdefault = "MUSIC"
     elsif params[:mt] == "VIDEO GAMES"
     @mediatype = "format=mVG&facet=subject%7Cgenre%5Bgame%5D"
-    @fdefault = "VIDEO GAMES" 
+    @fdefault = "VIDEO GAMES"
     elsif params[:mt] == "ALL FORMATS"
     @mediatype = "format="
-    @fdefault = "ALL" 
+    @fdefault = "ALL"
     end
-    else 
+    else
     @mediatype = "format="
 end
 
-if params[:st].present? 
+if params[:st].present?
 if params[:st] == "keyword"
 @searchby = "&qtype=keyword"
 @stdefault = "KEYWORD"
@@ -233,25 +233,25 @@ else
 end
 
 
-  
-if params[:q].present? 
 
-@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=24'+ @sorttype +'&page='+ @nextpage +'&'+@facet 
+if params[:q].present?
+
+@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=24'+ @sorttype +'&page='+ @nextpage +'&'+@facet
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
 elsif params[:mt].present?
 @pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=&qtype=keyword&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=24'+ @sorttype +'&page='+ @nextpage +'&facet='+ @facet
 url = @pagetitle
-@doc = Nokogiri::HTML(open(url))  
+@doc = Nokogiri::HTML(open(url))
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
 end
 
-@itemlist = @doc.css(".result_table_row").map do |item| 
+@itemlist = @doc.css(".result_table_row").map do |item|
 {
-:title => item.at_css(".bigger").text.strip, 
+:title => item.at_css(".bigger").text.strip,
 :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+:availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "),
 :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
 :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
 :image => item.at_css(".result_table_pic").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
@@ -260,7 +260,7 @@ end
 :record_year => item.at_css(".record_year").try(:text),
 :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/")
 }
-end 
+end
 
 
 
@@ -326,7 +326,7 @@ fix = %q[subject')"]
 @record_id = params[:record_id]
 @pagetitle = 'http://catalog.tadl.org/eg/opac/record/' + @record_id + '?locg=22;copy_offset=0;copy_limit=75'
 url = @pagetitle
-@doc = Nokogiri::HTML(open(url)) 
+@doc = Nokogiri::HTML(open(url))
 @record_details = @doc.css("#main-content").map do |detail|
 
 {
@@ -443,7 +443,7 @@ headers['Access-Control-Allow-Origin'] = "*"
 @record_id = params[:record_id]
 agent = set_token(params[:token])
 holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?;locg=22;hold_target='+ @record_id +';hold_type=T;')
-holdform = agent.page.forms[1]  
+holdform = agent.page.forms[1]
 holdconfirm = agent.submit(holdform)
 @doc = holdconfirm.parser
 @confirm_message = @doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
@@ -459,7 +459,7 @@ headers['Access-Control-Allow-Origin'] = "*"
 @split_formated = @split_ids.map! { |k| "&hold_target=#{k}" }.join
 agent = set_token(params[:token])
 holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?hold_type=T&loc=22'+@split_formated)
-holdform = agent.page.forms[1]  
+holdform = agent.page.forms[1]
 holdconfirm = agent.submit(holdform)
 @doc = holdconfirm.parser
 @confirm_message = @doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
@@ -501,7 +501,7 @@ checkout:
 end
 
 respond_to do |format|
-format.json { render :json => Oj.dump(:checkouts => @checkouts, :response => @renew_summary)}   
+format.json { render :json => Oj.dump(:checkouts => @checkouts, :response => @renew_summary)}
 end
 end
 
@@ -512,7 +512,7 @@ agent = set_token(params[:token])
 renew = agent.get('https://catalog.tadl.org/eg/opac/myopac/holds?&action=cancel&hold_id='+ @hold_id +'')
 
 respond_to do |format|
-format.json { render :json => Oj.dump("Hello")}   
+format.json { render :json => Oj.dump("Hello")}
 end
 
 end
@@ -521,14 +521,16 @@ end
 #this can probably replace cancelhold, ultimately
 def holdaction
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
-    dostuff = agent.post('https://catalog.tadl.org/eg/opac/myopac/holds', {
+    url = 'https://catalog.tadl.org/eg/opac/myopac/holds'
+    postvars = {
         "action" => params[:todo],
         "hold_id" => params[:hold_id],
-    })
+    }
+    prepare_agent = set_token(params[:token], url, postvars)
+    page = prepare_agent[1]
 
     respond_to do |format|
-        format.json { render :json => Oj.dump("Hello")}
+        format.json { render :json => {:status => page.code}}
     end
 end
 
@@ -539,12 +541,12 @@ agent = login_action(params[:u],params[:pw])
 page = agent.get("https://catalog.tadl.org/eg/opac/myopac/main")
 @doc = page.parser
 
-@user = @doc.css("body").map do |item| 
+@user = @doc.css("body").map do |item|
 {
 user:
 {
 :name => item.at_css('#dash_user').try(:text).try(:strip),
-:melcat_id => item.at_css('p:contains("Your MeLCat ID")').try(:text).try(:gsub!, "Your MeLCat ID is:","").try(:strip), 
+:melcat_id => item.at_css('p:contains("Your MeLCat ID")').try(:text).try(:gsub!, "Your MeLCat ID is:","").try(:strip),
 :checkouts => item.at_css('#dash_checked').try(:text).try(:strip),
 :holds => item.at_css('#dash_holds').try(:text).try(:strip),
 :pickups => item.at_css('#dash_pickup').try(:text).try(:strip),
@@ -620,7 +622,7 @@ def showcheckouts
                 :barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
             }
         }
-        end 
+        end
 
         respond_to do |format|
             format.json { render :json => { :checkouts => @checkouts, :status => page.code}}
@@ -655,7 +657,7 @@ def showholds
                 :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
             }
         }
-        end 
+        end
         respond_to do |format|
             format.json { render :json => {:holds => @holds, :status => page.code}}
         end
@@ -690,7 +692,7 @@ def showpickups
                 :status => checkout.css("/td[9]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:gsub, /([0-9]{2}\/[0-9]{2}\/[0-9]{4}).*/, "\\1").try(:gsub, /hold/,"in line waiting").try(:gsub, /Waiting for copy/,"You are number").try(:gsub, /AvailableExpires/,"Ready for Pickup. Expires on"),
             }
         }
-        end 
+        end
 
         respond_to do |format|
             format.json { render :json => {:holds => @holds, :status => page.code}}
@@ -735,14 +737,14 @@ def search_prefs
         else
             hold_retention = 'off'
         end
-        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_settings', { 
+        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/prefs_settings', {
             "opac.default_pickup_location" => options[0],
             "history.circ.retention_start" => circ_retention,
             "history.hold.retention_start" => hold_retention,
         })
     end
     if params[:new_email]	
-        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/update_email', { 
+        attack = agent.post('https://catalog.tadl.org/eg/opac/myopac/update_email', {
             "email" => params[:new_email],
             "current_pw" => params[:pw],
         })
@@ -812,12 +814,12 @@ def search_prefs
     @email_address = @doc.at_css('td:contains("Email Address")').try(:next_element).try(:text)
     @hold_shelf_alias = @doc.at_css('td:contains("Holdshelf Alias")').try(:next_element).try(:text)
     respond_to do |format|
-    format.json { 
-        render :json => { 
-            :settings => {  
-                :pickup => @pickup_setting, 
-                :circ => @circ_setting, 
-                :hold => @hold_setting, 
+    format.json {
+        render :json => {
+            :settings => {
+                :pickup => @pickup_setting,
+                :circ => @circ_setting,
+                :hold => @hold_setting,
                 :hold_notify_email => @hold_notify_email,
                 :hold_notify_phone => @hold_notify_phone,
                 :opac_username => @opac_username,
@@ -840,9 +842,10 @@ def login_action(username, password)
     return agent
 end
 
+#not used by app
 def create_list
     agent = login_action(params[:u],params[:pw])
-    agent.post('/eg/opac/myopac/list/update?loc=22', { 
+    agent.post('/eg/opac/myopac/list/update?loc=22', {
         "loc" => '22',
         "name" => params[:title],
         "action" => 'create',
@@ -858,10 +861,11 @@ def create_list
     end
 end
 
+#not used by app
 def add_to_list
     record_id_container = ''
     record_ids = params[:record_ids].split(',')
-    record_ids.each do |r| 
+    record_ids.each do |r|
         record = 'record=' + r + '&'
         record_id_container = record_id_container + record
     end
@@ -872,7 +876,7 @@ def add_to_list
 
     agent = login_action(params[:u],params[:pw])
     agent.get(add_to_list_url)
-    agent.get(post_url, [], list_url) 
+    agent.get(post_url, [], list_url)
 
     respond_to do |format|
         format.json { render :json =>{:message => @post_url}}
@@ -911,18 +915,18 @@ def get_list
         list_name = doc.css(".result-bookbag-name").text
         list_id = list_id
         if params[:just_ids] == 'yes'
-            itemlist = doc.css(".result_table_row").take(6).map do |item| 
+            itemlist = doc.css(".result_table_row").take(6).map do |item|
                 {
                     :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
                 }
-            end 
+            end
         else
             if params[:featured] == 'yes'
-                itemlist = doc.css(".result_table_row").take(20).map do |item| 
+                itemlist = doc.css(".result_table_row").take(20).map do |item|
                     {
-                        :title => item.at_css(".bigger").text.strip, 
+                        :title => item.at_css(".bigger").text.strip,
                         :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-                        :availability => '', 
+                        :availability => '',
                         :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
                         :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
                         :list_item_id => item.at_css(".list-item-id").attr('title'),
@@ -934,11 +938,11 @@ def get_list
                     }
                 end
             else
-                itemlist = doc.css(".result_table_row").map do |item| 
+                itemlist = doc.css(".result_table_row").map do |item|
                     {
-                        :title => item.at_css(".bigger").text.strip, 
+                        :title => item.at_css(".bigger").text.strip,
                         :author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-                        :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "), 
+                        :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "),
                         :online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
                         :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
                         :list_item_id => item.at_css(".list-item-id").try(:attr, "title"),
@@ -949,7 +953,7 @@ def get_list
                         :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
                     }
                 end
-            end 
+            end
         end
         respond_to do |format|
             format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist, :status => page.code}}
@@ -969,13 +973,13 @@ def by_id
     step_one = 'id%7Cbibid%3A' + i + '%20%7C%7C'
     ids = ids + step_one
   end
-    
+
   url = 'http://catalog.tadl.org/eg/opac/results?loc=22&limit=24&query='+ids+''
   agent = Mechanize.new
   page = agent.get(url)
   html = page.parser
-    
-    items = html.css(".result_table_row").map do |item| 
+
+    items = html.css(".result_table_row").map do |item|
       {
         :availability => item.at_css(".result_count").try(:text).try(:strip).try(:gsub!, /in TADL district./," "),
         :record_id => item.at_css(".search_link").attr('name').sub!(/record_/, ""),
@@ -1003,17 +1007,17 @@ def set_token(token, url = '', params = '')
 	cookie.path = "/"
 	agent.cookie_jar.add!(cookie)
     if url != ''
-       if params != '' 
+       if params != ''
             page = agent.post(url, params) rescue page = Mechanize::Page.new(uri = nil, response = nil, body = nil, code = '500', mech = nil)
             return agent, page
        else
             agent.redirect_ok = false
             page = agent.get(url) rescue page = Mechanize::Page.new(uri = nil, response = nil, body = nil, code = '500', mech = nil)
             return agent, page
-       end 
+       end
     else
             return agent
-    end   
+    end
 end
 
 def get_hold_history
@@ -1028,7 +1032,7 @@ def get_hold_history
     prepare_agent = set_token(params[:token], url)
     # preparge_agent returns an array with agent and page in that order
     page = prepare_agent[1]
-    if page.code == '200' 
+    if page.code == '200'
         doc = page.parser
         hold_list = doc.css('#holds_main/table/tbody/tr').map do |c|
             {
@@ -1037,7 +1041,7 @@ def get_hold_history
                 :author => c.css('td[2]/div/a[1]').text,
             }
         end
-    
+
         if doc.css('.invisible:contains("next")').present?
             more = "false"
         else
@@ -1045,13 +1049,13 @@ def get_hold_history
         end
 
         respond_to do |format|
-            format.json { render :json =>{:holds => hold_list, :more => more}}
+            format.json { render :json =>{:holds => hold_list, :status => page.code, :more => more}}
         end
     else
         respond_to do |format|
-            format.json { render :json =>{:message => 'badness', :status => page.code}}
+            format.json { render :json =>{:status => page.code}}
         end
-    end    
+    end
 end
 
 
@@ -1062,115 +1066,140 @@ end
 
 def receipt_print
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
     url = 'https://catalog.tadl.org/eg/opac/myopac/receipt_print'
-    page = agent.post(url, {
+    topost = {
         "payment" => params[:pmt_id],
-    })
-    doc = page.parser
-    response = doc.at_css('#printable-receipt').to_s.gsub(/\n/,'')
-    respond_to do |format|
-        format.json { render :json =>{:message => response}}
+    }
+    prepare_agent = set_token(params[:token], url, topost)
+    page = prepare_agent[1]
+    if page.code == '200'
+        doc = page.parser
+        response = doc.at_css('#printable-receipt').to_s.gsub(/\n/,'')
+        respond_to do |format|
+            format.json { render :json =>{:message => response, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
     end
 end
 
 def receipt_email
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
     url = 'https://catalog.tadl.org/eg/opac/myopac/receipt_email'
-    page = agent.post(url, {
+    topost = {
         "payment" => params[:pmt_id],
-    })
-    doc = page.parser
-    response = doc.css('#main-content').map do |c|
-        {
-            :message => c.css('div').text.try(:strip),
-        }
-    end
-    respond_to do |format|
-        format.json { render :json =>{:message => response}}
+    }
+    prepare_agent = set_token(params[:token], url, topost)
+    page = prepare_agent[1]
+    if page.code == '200'
+        response = doc.css('#main-content').map do |c|
+            {
+                :message => c.css('div').text.try(:strip),
+            }
+        end
+        respond_to do |format|
+            format.json { render :json =>{:message => response, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
     end
 end
 
+# this needs testing with more accounts (specifically ones that have a LOT of bills)
 def get_fines
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
     if params[:page]
         page = params[:page].to_i * 20
     else
         page = 0
     end
-# this needs testing with more accounts (specifically ones that have a LOT of bills)
     url = 'https://catalog.tadl.org/eg/opac/myopac/main?limit=20;offset=' + page.to_s
-    page = agent.get(url)
-    doc = page.parser
-    fines_list = doc.css('#myopac_trans_div/table/tbody/tr').map do |c|
-        {
-            :transaction_start_date => c.css('td[1]').text.try(:strip),
-            :last_pmt_date => c.css('td[2]').text.try(:strip),
-            :initial_amt_owed => c.css('td[3]').text.try(:strip),
-            :total_amt_paid => c.css('td[4]').text.try(:strip),
-            :balance_owed => c.css('td[5]').text.try(:strip),
-            :billing_type => c.css('td[6]').text.try(:strip),
-        }
-    end
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        doc = page.parser
+        fines_list = doc.css('#myopac_trans_div/table/tbody/tr').map do |c|
+            {
+                :transaction_start_date => c.css('td[1]').text.try(:strip),
+                :last_pmt_date => c.css('td[2]').text.try(:strip),
+                :initial_amt_owed => c.css('td[3]').text.try(:strip),
+                :total_amt_paid => c.css('td[4]').text.try(:strip),
+                :balance_owed => c.css('td[5]').text.try(:strip),
+                :billing_type => c.css('td[6]').text.try(:strip),
+            }
+        end
 
-    #if doc.css('.invisible:contains("Next")').present?
-        more = "false"
-    #else
-    #    more = "true"
-    #end
+        #if doc.css('.invisible:contains("Next")').present?
+            more = "false"
+        #else
+        #    more = "true"
+        #end
 
-    respond_to do |format|
-        format.json { render :json =>{:fines => fines_list, :more => more}}
+        respond_to do |format|
+            format.json { render :json =>{:fines => fines_list, :more => more, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
     end
 end
 
 def get_payment_history
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
     if params[:page]
         page = params[:page].to_i * 20
     else
         page = 0
     end
     url = 'https://catalog.tadl.org/eg/opac/myopac/main_payments?limit=20;offset=' + page.to_s
-    page = agent.get(url)
-    doc = page.parser
-    payments_list = doc.css('table.myopac_payments_table/tbody/tr').map do |c|
-        {
-            :pmt_date => c.css('td[1]').text,
-            :pmt_for => c.css('td[2]').text,
-            :pmt_id => c.at_css('td[4]/form/input[1]').attr('value'),
-            :pmt_amt => c.css('td[3]').text,
-        }
-    end
-    
-    if doc.css('.invisible:contains("Next")').present?
-        more = "false"
-    else
-        more = "true"
-    end
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        doc = page.parser
+        payments_list = doc.css('table.myopac_payments_table/tbody/tr').map do |c|
+            {
+                :pmt_date => c.css('td[1]').text,
+                :pmt_for => c.css('td[2]').text,
+                :pmt_id => c.at_css('td[4]/form/input[1]').attr('value'),
+                :pmt_amt => c.css('td[3]').text,
+            }
+        end
 
-    respond_to do |format|
-        format.json { render :json =>{:payments => payments_list, :more => more}}
+        if doc.css('.invisible:contains("Next")').present?
+            more = "false"
+        else
+            more = "true"
+        end
+
+        respond_to do |format|
+            format.json { render :json =>{:payments => payments_list, :more => more, :status => page.code}}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
     end
 end
 
 
 def get_checkout_history
 	headers['Access-Control-Allow-Origin'] = "*"
-    
+
     if params[:page]
         page_number = params[:page].to_i * 15
     else
-        page_number = 0    
+        page_number = 0
     end
 
     url = 'https://catalog.tadl.org/eg/opac/myopac/circ_history?loc=22;limit=15;offset=' + page_number.to_s
     prepare_agent = set_token(params[:token], url)
     page = prepare_agent[1]
-    if  page.code == '200' 
+    if  page.code == '200'
         doc = page.parser
         checkout_list = doc.css('#checked_main/table/tbody/tr').map do |c|
             {
@@ -1179,40 +1208,40 @@ def get_checkout_history
                 :author => c.css('td[1]/a[2]').text,
                 :date_due => c.css('td[3]').text.try(:strip).try(:squeeze, " "),
                 :date_out => c.css('td[2]').text.try(:strip).try(:squeeze, " "),
-                :date_in => c.css('td[4]').text.try(:strip).try(:squeeze, " "),  
+                :date_in => c.css('td[4]').text.try(:strip).try(:squeeze, " "),
             }
         end
-    
+
         if doc.css('.invisible:contains("Next")').present?
             more = "false"
         else
             more = "true"
         end
-            
+
         respond_to do |format|
             format.json { render :json =>{:checkouts => checkout_list, :more => more, :status => page.code}}
-        end 
+        end
     else
         respond_to do |format|
             format.json { render :json =>{:message => "badness", :status => page.code}}
-        end 
-    end    
+        end
+    end
 end
 
 
-
+#not used by app
 def get_user_with_token
 	agent = set_token(params[:token])
 	page = agent.get('http://catalog.tadl.org')
 	doc = page.parser
-	user_info = doc.css("body").map do |item| 
-	{
-	:name => item.at_css('#dash_user').try(:text).try(:strip),
-	:checkouts => item.at_css('#dash_checked').try(:text).try(:strip),
-	:holds => item.at_css('#dash_holds').try(:text).try(:strip),
-	:pickups => item.at_css('#dash_pickup').try(:text).try(:strip),
-	:fines => item.at_css('#dash_fines').try(:text).try(:strip),
-	}
+	user_info = doc.css("body").map do |item|
+        {
+            :name => item.at_css('#dash_user').try(:text).try(:strip),
+            :checkouts => item.at_css('#dash_checked').try(:text).try(:strip),
+            :holds => item.at_css('#dash_holds').try(:text).try(:strip),
+            :pickups => item.at_css('#dash_pickup').try(:text).try(:strip),
+            :fines => item.at_css('#dash_fines').try(:text).try(:strip),
+        }
 	end
 	respond_to do |format|
 		format.json { render :json =>{:user => user_info }}
@@ -1221,58 +1250,67 @@ end
 
 def remove_list_item
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
     url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'
-    page = agent.post(url, {
+    topost = {
         "list" => params[:listid],
         "selected_item" => params[:itemid],
         "action" => "del_item",
-    })
+    }
+    prepare_agent = set_token(params[:token], url, topost)
+    page = prepare_agent[1]
     respond_to do |format|
-        format.json { render :json => {:result => "done"}}
+        format.json { render :json => {:status => page.code}}
     end
 end
 
 def get_user_lists
 	headers['Access-Control-Allow-Origin'] = "*"
-	agent = set_token(params[:token])
-	page = agent.get('https://catalog.tadl.org/eg/opac/myopac/lists')
-	doc = page.parser
-	lists = doc.css('.bookbag-controls-holder').map do |l|
-        {
-            :list_name => l.at_css('h2').text,
-            :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
-            :list_desc => l.css('.bookbag-description').text,
-        }
-	end
-	offset = 0
-	added_value = 10
-	until doc.css('.invisible:contains("Next")').present? == true 
-		offset = offset + added_value
-		url = 'https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;limit=10;offset=' + offset.to_s
-		page = agent.get(url)
-		doc = page.parser
-		page_list = doc.css('.bookbag-controls-holder').map do |l|
+    url = 'https://catalog.tadl.org/eg/opac/myopac/lists'
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    if page.code == '200'
+        doc = page.parser
+        lists = doc.css('.bookbag-controls-holder').map do |l|
             {
                 :list_name => l.at_css('h2').text,
-                :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
+                :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
                 :list_desc => l.css('.bookbag-description').text,
             }
-		end
-		lists = lists + page_list
-	end
+        end
+        offset = 0
+        added_value = 10
+        until doc.css('.invisible:contains("Next")').present? == true
+            offset = offset + added_value
+            url = 'https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;limit=10;offset=' + offset.to_s
+            page = agent.get(url)
+            doc = page.parser
+            page_list = doc.css('.bookbag-controls-holder').map do |l|
+                {
+                    :list_name => l.at_css('h2').text,
+                    :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
+                    :list_desc => l.css('.bookbag-description').text,
+                }
+            end
+            lists = lists + page_list
+        end
 
-	respond_to do |format|
-		format.json { render :json =>{:lists => lists}}
-	end	
+        respond_to do |format|
+            format.json { render :json =>{:lists => lists, :status => page.code}}
+        end	
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code}}
+        end
+    end
 end
 
 
 #updated but needs to do something else to verify if things work as expected
+#this isn't used by the app -wjr
 def remove_from_list
     headers['Access-Control-Allow-Origin'] = "*"
     url = 'https://catalog.tadl.org/eg/opac/myopac/list/update?loc=22'
-    post_params =  { 
+    post_params =  {
         "loc" => '22',
         "sort" => "",
         "list" => params[:list_id],
@@ -1290,7 +1328,6 @@ end
 
 def create_new_list
     headers['Access-Control-Allow-Origin'] = "*"
-    agent = set_token(params[:token])
 
     # fetch params and set up vars
     listname = params[:name]
@@ -1298,68 +1335,77 @@ def create_new_list
     recordids = records.split(',')
     cat = ''
 
-    # build move component
-    recordids.each do |r|
-        cat << "&record=" + r
-    end
+    firsturl = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + records
+    prepare_agent = set_token(params[:token], firsturl)
 
     # add items to temporary list
-    url = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + records
-    page = agent.get(url)
+    page = prepare_agent[1]
+    status_code = page.code
 
-    # create the new list
-    url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'
-    agent.post(url, {
-        "action" => "create",
-        "name" => listname,
-        "shared" => "0",
-    })
-    
-    # get a list of all lists
-    url = 'https://catalog.tadl.org/eg/opac/myopac/lists'
-    page = agent.get(url)
-    doc = page.parser
-    lists = doc.css('.bookbag-controls-holder').map do |l|
-        {
-            :list_name => l.at_css('h2').text,
-            :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
-            :list_desc => l.css('.bookbag-description').text,
-        }
-    end
-    offset = 0
-    added_value = 10
-    until doc.css('.invisible:contains("Next")').present? == true
-        offset = offset + added_value
-        url = 'https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;limit=10;offset=' + offset.to_s
+    if status_code == '200'
+
+        # build move component
+        recordids.each do |r|
+            cat << "&record=" + r
+        end
+
+        # create the new list
+        url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'
+        agent.post(url, {
+            "action" => "create",
+            "name" => listname,
+            "shared" => "0",
+        })
+
+        # get a list of all lists
+        url = 'https://catalog.tadl.org/eg/opac/myopac/lists'
         page = agent.get(url)
         doc = page.parser
-        page_list = doc.css('.bookbag-controls-holder').map do |l|
+        lists = doc.css('.bookbag-controls-holder').map do |l|
             {
                 :list_name => l.at_css('h2').text,
-                :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
+                :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split('?')[1].gsub('bbid=',''),
                 :list_desc => l.css('.bookbag-description').text,
             }
         end
-        lists = lists + page_list
-    end
+        offset = 0
+        added_value = 10
+        until doc.css('.invisible:contains("Next")').present? == true
+            offset = offset + added_value
+            url = 'https://catalog.tadl.org/eg/opac/myopac/lists?loc=22;limit=10;offset=' + offset.to_s
+            page = agent.get(url)
+            doc = page.parser
+            page_list = doc.css('.bookbag-controls-holder').map do |l|
+                {
+                    :list_name => l.at_css('h2').text,
+                    :list_id => l.at_css('.bookbag-name').css('a').attr('href').text.split(';', 4)[3].gsub('bbid=',''),
+                    :list_desc => l.css('.bookbag-description').text,
+                }
+            end
+            lists = lists + page_list
+        end
 
-    # get the ID of the new list from the list of lists
-    new_list_id = []
-    lists.each do |foo|
-        if (foo[:list_name] == listname)
-            new_list_id = foo[:list_id]
+        # get the ID of the new list from the list of lists
+        new_list_id = []
+        lists.each do |foo|
+            if (foo[:list_name] == listname)
+                new_list_id = foo[:list_id]
+            end
+        end
+
+        # move all the items to the new list
+        url = 'https://catalog.tadl.org/eg/opac/mylist/move?action=' + new_list_id + cat
+        page = agent.get(url)
+
+        # send response (new list id)
+        respond_to do |format|
+            format.json { render :json => {:listid => new_list_id, :status => status_code }}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json => {:status => status_code }}
         end
     end
-    
-    # move all the items to the new list
-    url = 'https://catalog.tadl.org/eg/opac/mylist/move?action=' + new_list_id + cat
-    page = agent.get(url)
-    
-    # send response (new list id)
-    respond_to do |format|
-        format.json { render :json => { :listid => new_list_id  }}
-    end
-
 end
 
 def bulk_add_to_list
@@ -1464,5 +1510,5 @@ def passwordreset
     format.json { render json: @response }
   end
 end
-  
+
 end
