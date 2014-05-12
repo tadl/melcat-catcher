@@ -1344,9 +1344,9 @@ def create_new_list
     cat = ''
 
     firsturl = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + records
-    prepare_agent = set_token(params[:token], firsturl)
 
     # add items to temporary list
+    prepare_agent = set_token(params[:token], firsturl)
     page = prepare_agent[1]
     status_code = page.code
 
