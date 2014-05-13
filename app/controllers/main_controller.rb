@@ -439,17 +439,18 @@ end
 
 
 def hold
-headers['Access-Control-Allow-Origin'] = "*"
-@record_id = params[:record_id]
-agent = set_token(params[:token])
-holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?;locg=22;hold_target='+ @record_id +';hold_type=T;')
-holdform = agent.page.forms[1]
-holdconfirm = agent.submit(holdform)
-@doc = holdconfirm.parser
-@confirm_message = @doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
-respond_to do |format|
-format.json { render :json => Oj.dump(:message => @confirm_message)  }
-end
+    headers['Access-Control-Allow-Origin'] = "*"
+    record_id = params[:record_id]
+    agent = set_token(params[:token])
+    holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?;locg=22;hold_target='+ record_id +';hold_type=T;')
+    holdform = agent.page.forms[1]
+    holdconfirm = agent.submit(holdform)
+    doc = holdconfirm.parser
+    confirm_message = doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
+
+    respond_to do |format|
+        format.json { render :json =>{:message => confirm_message }}
+    end
 end
 
 def multihold
