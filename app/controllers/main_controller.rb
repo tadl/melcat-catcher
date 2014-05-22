@@ -971,7 +971,7 @@ def get_list
             end
         end
         respond_to do |format|
-            format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist, :status => page.code, :more_results => more_results }}
+            format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist, :status => page.code, :more => more_results }}
         end
     else
         respond_to do |format|
