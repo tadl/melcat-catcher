@@ -924,6 +924,11 @@ def get_list
         doc = page.parser
         list_name = doc.css(".result-bookbag-name").text
         list_id = list_id
+        if doc.at_css('#this_is_my_list')
+            my_list = true
+        else
+            my_list = false
+        end
         if params[:just_ids] == 'yes'
             itemlist = doc.css(".result_table_row").take(6).map do |item|
                 {
@@ -971,7 +976,7 @@ def get_list
             end
         end
         respond_to do |format|
-            format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist, :status => page.code, :more => more_results }}
+            format.json { render :json =>{:list_name => list_name, :list_id => list_id, :my_list => my_list, :items => itemlist, :status => page.code, :more => more_results }}
         end
     else
         respond_to do |format|
