@@ -910,7 +910,7 @@ def get_list
         available = ''
     end
 
-    url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=20' + available +'&page='+ page_number +'&locg=22'
+    url = 'https://catalog.tadl.org/eg/opac/results?bookbag='+ list_id +'&limit=20' + available +'&page='+ page_number +'&locg=22&sort=container_date.descending'
 
     if params[:token]
         prepare_agent = set_token(params[:token], url)
