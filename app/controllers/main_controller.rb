@@ -963,10 +963,15 @@ def get_list
                         :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
                     }
                 end
+                if doc.css('.invisible:contains(" Next ")').present?
+                    more_results = 'false'
+                else
+                    more_results = 'true'
+                end
             end
         end
         respond_to do |format|
-            format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist, :status => page.code}}
+            format.json { render :json =>{:list_name => list_name, :list_id => list_id, :items => itemlist, :status => page.code, :more => more_results }}
         end
     else
         respond_to do |format|
