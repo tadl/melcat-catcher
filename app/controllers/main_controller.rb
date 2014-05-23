@@ -1428,6 +1428,23 @@ def create_new_list
     end
 end
 
+def delete_list
+    headers['Access-Control-Allow-Origin'] = "*"
+    listid = params[:listid]
+    url = 'https://catalog.tadl.org/eg/opac/myopac/list/update'
+    post_params = {
+        "list" => listid,
+        "action" => "delete",
+    }
+    prepare_agent = set_token(params[:token], url, post_params)
+    page = prepare_agent[1]
+
+    respond_to do |format|
+        format.json { render :json => {:status => page.code }}
+    end
+end
+
+
 def bulk_add_to_list
     headers['Access-Control-Allow-Origin'] = "*"
     agent = set_token(params[:token])

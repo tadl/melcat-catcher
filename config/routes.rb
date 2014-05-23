@@ -27,6 +27,7 @@ Ilscatcher::Application.routes.draw do
   get "main/bulk_add_to_list"
   get "main/create_new_list"
   get "main/create_list"
+  get "main/delete_list"
   get "main/add_to_list"
   get "main/get_list"
   get "main/get_token"
