@@ -933,11 +933,19 @@ def get_list
         doc = page.parser
         list_name = doc.css(".result-bookbag-name").text
         list_id = list_id
+        
         if doc.at_css('#this_is_my_list')
             my_list = true
         else
             my_list = false
         end
+
+        if doc.css('.invisible:contains(" Next ")').present?
+            more_results = 'false'
+        else
+            more_results = 'true'
+        end
+
         if params[:just_ids] == 'yes'
             itemlist = doc.css(".result_table_row").take(6).map do |item|
                 {
@@ -976,11 +984,6 @@ def get_list
                         :record_year => item.at_css(".record_year").try(:text),
                         :format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
                     }
-                end
-                if doc.css('.invisible:contains(" Next ")').present?
-                    more_results = 'false'
-                else
-                    more_results = 'true'
                 end
             end
         end
