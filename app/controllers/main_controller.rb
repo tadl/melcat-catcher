@@ -441,15 +441,24 @@ end
 def hold
     headers['Access-Control-Allow-Origin'] = "*"
     record_id = params[:record_id]
+    url = 'https://catalog.tadl.org/eg/opac/place_hold?hold_target=' + record_id + ';hold_type=T'
     agent = set_token(params[:token])
-    holdpage = agent.get('https://catalog.tadl.org/eg/opac/place_hold?;locg=22;hold_target='+ record_id +';hold_type=T;')
-    holdform = agent.page.forms[1]
-    holdconfirm = agent.submit(holdform)
-    doc = holdconfirm.parser
-    confirm_message = doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
-
-    respond_to do |format|
-        format.json { render :json =>{:message => confirm_message }}
+    prepare_agent = set_token(params[:token], url)
+    page = prepare_agent[1]
+    #holdpage = prepare_agent[1]  #I HAVE NO IDEA WHY THIS DOESNT WORK!!!!!
+    holdpage = agent.get(url)
+    if page.code == '200'
+        holdform = agent.page.forms[1]
+        holdconfirm = agent.submit(holdform)
+        doc = holdconfirm.parser
+        confirm_message = doc.css("#hold-items-list").text.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last)
+        respond_to do |format|
+            format.json { render :json =>{:message => confirm_message, :status => page.code }}
+        end
+    else
+        respond_to do |format|
+            format.json { render :json =>{:status => page.code }}
+        end
     end
 end
 
