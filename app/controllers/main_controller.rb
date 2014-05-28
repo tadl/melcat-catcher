@@ -1367,14 +1367,17 @@ def create_new_list
     recordids = records.split(',')
     cat = ''
 
-    firsturl = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + records
-
-    # add items to temporary list
+    firsturl = 'https://catalog.tadl.org/eg/opac/myopac/main'
     prepare_agent = set_token(params[:token], firsturl)
     page = prepare_agent[1]
     status_code = page.code
 
     if status_code == '200'
+        url = 'https://catalog.tadl.org/eg/opac/mylist/add?record=' + records
+        agent = set_token(params[:token])
+
+        # add items to temporary list
+        page = agent.get(url)
 
         # build move component
         recordids.each do |r|
